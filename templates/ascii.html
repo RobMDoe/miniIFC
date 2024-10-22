@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    ascii
+{% endblock %}
+
+{% block main %}
+
+        <div style="background-color: rgb(0, 79, 159); color:white;padding:40px;">
+            <dl style="text-align:left">
+            {% for row in lines %}
+                <dt>{{ row }}</dt>
+            {% endfor %}
+            </dl>
+        </div>
+
+{% endblock %}

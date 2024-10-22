@@ -1,0 +1,378 @@
+import ifcopenshell.api.root
+import ifcopenshell.api.unit
+import ifcopenshell.api.context
+import ifcopenshell.api.project
+import ifcopenshell.api.spatial
+import ifcopenshell.api.geometry
+import ifcopenshell.api.aggregate
+
+import ifcopenshell.util
+import ifcopenshell.util.placement
+import numpy
+
+def ifcWall():
+
+    # Create a blank model
+    file = ifcopenshell.api.project.create_file()
+
+    # All projects must have one IFC Project element
+    project = ifcopenshell.api.root.create_entity(file, ifc_class="IfcProject", name="My Project")
+
+    # Geometry is optional in IFC, but because we want to use geometry in this example, let's define units
+    # Assigning without arguments defaults to metric units
+    ifcopenshell.api.unit.assign_unit(file)
+
+    # Let's create a modeling geometry context, so we can store 3D geometry (note: IFC supports 2D too!)
+    context = ifcopenshell.api.context.add_context(file, context_type="Model")
+
+    # In particular, in this example we want to store the 3D "body" geometry of objects, i.e. the body shape
+    body = ifcopenshell.api.context.add_context(file, context_type="Model",
+        context_identifier="Body", target_view="MODEL_VIEW", parent=context)
+
+    # Create a site, building, and storey. Many hierarchies are possible.
+    site = ifcopenshell.api.root.create_entity(file, ifc_class="IfcSite", name="My Site")
+    building = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuilding", name="Building A")
+    storey = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuildingStorey", name="Ground Floor")
+
+    # Since the site is our top level location, assign it to the project
+    # Then place our building on the site, and our storey in the building
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=project, products=[site])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=site, products=[building])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=building, products=[storey])
+
+    # Let's create a new wall
+    wall = ifcopenshell.api.root.create_entity(file, ifc_class="IfcWall")
+
+    # Object placement
+    # Translate
+        # XAxis_X, YAxis_X, ZAxis_X, X
+        # XAxis_Y, YAxis_Y, ZAxis_Y, Y
+        # XAxis_Z, YAxis_Z, ZAxis_Z, Z
+        # 0,       0,       0,       1
+    matrix = numpy.eye(4)
+    # Rotate around Z axis first
+    matrix = ifcopenshell.util.placement.rotation(90, "Z") @ matrix
+
+    matrix[:,3][0:3] = (-2.0, 0.0,-2.0)
+        # Matrix changed like this
+        # 0, -1, 0, n
+        # 1,  0, 0, n
+        # 0,  0, 1, n
+        # 0,  0, 0, 1
+    ifcopenshell.api.geometry.edit_object_placement(file, product=wall, matrix=matrix, is_si=True)
+
+    # Add a new wall-like body geometry
+    representation = ifcopenshell.api.geometry.add_wall_representation(file, context=body, length=5, height=4, thickness=0.3)
+    # Assign our new body geometry back to our wall
+    ifcopenshell.api.geometry.assign_representation(file, product=wall, representation=representation)
+
+    # Place our wall in the ground floor
+    ifcopenshell.api.spatial.assign_container(file, products=[wall], relating_structure=storey)
+
+    return file
+
+
+def ifcSlab1():
+
+    #LEVEL 1 FLOOR BUILD-UP
+
+    # Create a blank model
+    file = ifcopenshell.api.project.create_file()
+
+    # All projects must have one IFC Project element
+    project = ifcopenshell.api.root.create_entity(file, ifc_class="IfcProject", name="My Project")
+
+    # Geometry is optional in IFC, but because we want to use geometry in this example, let's define units
+    # Assigning without arguments defaults to metric units
+    ifcopenshell.api.unit.assign_unit(file)
+
+    # Let's create a modeling geometry context, so we can store 3D geometry (note: IFC supports 2D too!)
+    context = ifcopenshell.api.context.add_context(file, context_type="Model")
+
+    # REPRESENTATION CONTEXT
+    # In particular, in this example we want to store the 3D "body" geometry of objects, i.e. the body shape
+    body = ifcopenshell.api.context.add_context(file, context_type="Model",
+        context_identifier="Body", target_view="MODEL_VIEW", parent=context)
+
+    # Create a site, building, and storey. Many hierarchies are possible.
+    site = ifcopenshell.api.root.create_entity(file, ifc_class="IfcSite", name="My Site")
+    building = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuilding", name="Building A")
+    storey = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuildingStorey", name="Ground Floor")
+
+    # Since the site is our top level location, assign it to the project
+    # Then place our building on the site, and our storey in the building
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=project, products=[site])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=site, products=[building])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=building, products=[storey])
+
+    # Let's create a new slab
+    slab = ifcopenshell.api.root.create_entity(file, ifc_class="IfcSlab")
+
+    # PLACEMENT
+    matrix = numpy.eye(4)
+    # Rotate around X axis first
+    matrix = ifcopenshell.util.placement.rotation(90, "X") @ matrix
+
+    matrix[:,3][0:3] = (0, 0.4, 0)
+
+    # Give our slab a local origin at (0, 0, 0) USING MATRIX?
+    ifcopenshell.api.geometry.edit_object_placement(file, product=slab, matrix=matrix, is_si=True)
+
+    # REPRESENTATION
+    # Add a new slab-like body geometry, 200mm thick, flat
+    profile = file.create_entity("IfcRectangleProfileDef", ProfileName="4000x4000", ProfileType="AREA", XDim=4000, YDim=4000)
+    representation = ifcopenshell.api.geometry.add_profile_representation(file, context=body, profile=profile, depth=0.1)
+    
+    # ASSIGN REPRESENTATION BACK 
+    # Assign our new body geometry back to our slab
+    ifcopenshell.api.geometry.assign_representation(file, product=slab, representation=representation)
+
+    # Relate slab to ground floor
+    ifcopenshell.api.spatial.assign_container(file, products=[slab], relating_structure=storey)
+
+    return file
+
+
+def ifcSlab2():
+
+    #LEVEL 1 FLOOR BUILD-UP
+
+    # Create a blank model
+    file = ifcopenshell.api.project.create_file()
+
+    # All projects must have one IFC Project element
+    project = ifcopenshell.api.root.create_entity(file, ifc_class="IfcProject", name="My Project")
+
+    # Geometry is optional in IFC, but because we want to use geometry in this example, let's define units
+    # Assigning without arguments defaults to metric units
+    ifcopenshell.api.unit.assign_unit(file)
+
+    # Let's create a modeling geometry context, so we can store 3D geometry (note: IFC supports 2D too!)
+    context = ifcopenshell.api.context.add_context(file, context_type="Model")
+
+    # REPRESENTATION CONTEXT
+    # In particular, in this example we want to store the 3D "body" geometry of objects, i.e. the body shape
+    body = ifcopenshell.api.context.add_context(file, context_type="Model",
+        context_identifier="Body", target_view="MODEL_VIEW", parent=context)
+
+    # Create a site, building, and storey. Many hierarchies are possible.
+    site = ifcopenshell.api.root.create_entity(file, ifc_class="IfcSite", name="My Site")
+    building = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuilding", name="Building A")
+    storey = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuildingStorey", name="Ground Floor")
+
+    # Since the site is our top level location, assign it to the project
+    # Then place our building on the site, and our storey in the building
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=project, products=[site])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=site, products=[building])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=building, products=[storey])
+
+    # Let's create a new slab
+    slab = ifcopenshell.api.root.create_entity(file, ifc_class="IfcSlab")
+
+    # PLACEMENT
+    matrix = numpy.eye(4)
+    # Rotate around X axis first
+    matrix = ifcopenshell.util.placement.rotation(90, "X") @ matrix
+
+    matrix[:,3][0:3] = (0, 2.9, 0.5)
+
+    # Give our slab a local origin at (0, 0, 0) USING MATRIX?
+    ifcopenshell.api.geometry.edit_object_placement(file, product=slab, matrix=matrix, is_si=True)
+
+    # REPRESENTATION
+    # Add a new slab-like body geometry, 200mm thick, flat
+    profile = file.create_entity("IfcRectangleProfileDef", ProfileName="4000x3000", ProfileType="AREA", XDim=4000, YDim=3000)
+    representation = ifcopenshell.api.geometry.add_profile_representation(file, context=body, profile=profile, depth=0.1)
+    
+    # ASSIGN REPRESENTATION BACK 
+    # Assign our new body geometry back to our slab
+    ifcopenshell.api.geometry.assign_representation(file, product=slab, representation=representation)
+
+    # Relate slab to ground floor
+    ifcopenshell.api.spatial.assign_container(file, products=[slab], relating_structure=storey)
+
+    return file
+
+def ifcBeam1():
+
+    # ROOF BEAM
+
+    # Create a blank model
+    file = ifcopenshell.api.project.create_file()
+
+    # All projects must have one IFC Project element
+    project = ifcopenshell.api.root.create_entity(file, ifc_class="IfcProject", name="My Project")
+
+    # Geometry is optional in IFC, but because we want to use geometry in this example, let's define units
+    # Assigning without arguments defaults to metric units
+    ifcopenshell.api.unit.assign_unit(file)
+
+    # Let's create a modeling geometry context, so we can store 3D geometry (note: IFC supports 2D too!)
+    context = ifcopenshell.api.context.add_context(file, context_type="Model")
+
+    # REPRESENTATION CONTEXT
+    # In particular, in this example we want to store the 3D "body" geometry of objects, i.e. the body shape
+    body = ifcopenshell.api.context.add_context(file, context_type="Model",
+        context_identifier="Body", target_view="MODEL_VIEW", parent=context)
+
+    # Create a site, building, and storey. Many hierarchies are possible.
+    site = ifcopenshell.api.root.create_entity(file, ifc_class="IfcSite", name="My Site")
+    building = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuilding", name="Building A")
+    storey = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuildingStorey", name="Ground Floor")
+
+    # Since the site is our top level location, assign it to the project
+    # Then place our building on the site, and our storey in the building
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=project, products=[site])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=site, products=[building])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=building, products=[storey])
+
+    # Let's create a new slab
+    beam1 = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBeam")
+
+    # PLACEMENT
+    matrix = numpy.eye(4)
+    # Rotate around X axis first
+    matrix = ifcopenshell.util.placement.rotation(90, "Y") @ matrix
+
+    matrix[:,3][0:3] = (-2.3, 5.1, 0.0)
+
+    # Give our slab a local origin at (0, 0, 0) USING MATRIX?
+    ifcopenshell.api.geometry.edit_object_placement(file, product=beam1, matrix=matrix, is_si=True)
+
+    # REPRESENTATION
+    # Add a new beam body geometry
+    profile = file.create_entity("IfcRectangleProfileDef", ProfileName="100x200", ProfileType="AREA", XDim=100, YDim=200)
+    representation = ifcopenshell.api.geometry.add_profile_representation(file, context=body, profile=profile, depth=4.3)
+    
+    # ASSIGN REPRESENTATION BACK 
+    # Assign our new body geometry back to our slab
+    ifcopenshell.api.geometry.assign_representation(file, product=beam1, representation=representation)
+
+    # Relate beam to ground floor
+    ifcopenshell.api.spatial.assign_container(file, products=[beam1], relating_structure=storey)
+
+    return file
+
+def ifcBeam2():
+
+    # FLOOR BEAM
+
+    # Create a blank model
+    file = ifcopenshell.api.project.create_file()
+
+    # All projects must have one IFC Project element
+    project = ifcopenshell.api.root.create_entity(file, ifc_class="IfcProject", name="My Project")
+
+    # Geometry is optional in IFC, but because we want to use geometry in this example, let's define units
+    # Assigning without arguments defaults to metric units
+    ifcopenshell.api.unit.assign_unit(file)
+
+    # Let's create a modeling geometry context, so we can store 3D geometry (note: IFC supports 2D too!)
+    context = ifcopenshell.api.context.add_context(file, context_type="Model")
+
+    # REPRESENTATION CONTEXT
+    # In particular, in this example we want to store the 3D "body" geometry of objects, i.e. the body shape
+    body = ifcopenshell.api.context.add_context(file, context_type="Model",
+        context_identifier="Body", target_view="MODEL_VIEW", parent=context)
+
+    # Create a site, building, and storey. Many hierarchies are possible.
+    site = ifcopenshell.api.root.create_entity(file, ifc_class="IfcSite", name="My Site")
+    building = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuilding", name="Building A")
+    storey = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuildingStorey", name="Ground Floor")
+
+    # Since the site is our top level location, assign it to the project
+    # Then place our building on the site, and our storey in the building
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=project, products=[site])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=site, products=[building])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=building, products=[storey])
+
+    # Let's create a new slab
+    beam2 = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBeam")
+
+    # PLACEMENT
+    matrix = numpy.eye(4)
+    # Rotate around X axis first
+    matrix = ifcopenshell.util.placement.rotation(90, "Y") @ matrix
+
+    matrix[:,3][0:3] = (-2.0, 0.2, 0.0)
+
+    # Give our slab a local origin at (0, 0, 0) USING MATRIX?
+    ifcopenshell.api.geometry.edit_object_placement(file, product=beam2, matrix=matrix, is_si=True)
+
+    # REPRESENTATION
+    # Add a new beam body geometry
+    profile = file.create_entity("IfcRectangleProfileDef", ProfileName="100x200", ProfileType="AREA", XDim=100, YDim=200)
+    representation = ifcopenshell.api.geometry.add_profile_representation(file, context=body, profile=profile, depth=4.0)
+    
+    # ASSIGN REPRESENTATION BACK 
+    # Assign our new body geometry back to our slab
+    ifcopenshell.api.geometry.assign_representation(file, product=beam2, representation=representation)
+
+    # Relate beam to ground floor
+    ifcopenshell.api.spatial.assign_container(file, products=[beam2], relating_structure=storey)
+
+    return file
+
+
+def ifcRoof():
+
+    # ROOF BUILD UP
+
+    # Create a blank model
+    file = ifcopenshell.api.project.create_file()
+
+    # All projects must have one IFC Project element
+    project = ifcopenshell.api.root.create_entity(file, ifc_class="IfcProject", name="My Project")
+
+    # Geometry is optional in IFC, but because we want to use geometry in this example, let's define units
+    # Assigning without arguments defaults to metric units
+    ifcopenshell.api.unit.assign_unit(file)
+
+    # Let's create a modeling geometry context, so we can store 3D geometry (note: IFC supports 2D too!)
+    context = ifcopenshell.api.context.add_context(file, context_type="Model")
+
+    # In particular, in this example we want to store the 3D "body" geometry of objects, i.e. the body shape
+    body = ifcopenshell.api.context.add_context(file, context_type="Model",
+        context_identifier="Body", target_view="MODEL_VIEW", parent=context)
+
+    # Create a site, building, and storey. Many hierarchies are possible.
+    site = ifcopenshell.api.root.create_entity(file, ifc_class="IfcSite", name="My Site")
+    building = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuilding", name="Building A")
+    storey = ifcopenshell.api.root.create_entity(file, ifc_class="IfcBuildingStorey", name="Ground Floor")
+
+    # Since the site is our top level location, assign it to the project
+    # Then place our building on the site, and our storey in the building
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=project, products=[site])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=site, products=[building])
+    ifcopenshell.api.aggregate.assign_object(file, relating_object=building, products=[storey])
+
+    # Let's create a new roof
+    roof = ifcopenshell.api.root.create_entity(file, ifc_class="IfcRoof")
+
+    # PLACEMENT
+    matrix = numpy.eye(4)
+    # Rotate around X axis first
+    matrix = ifcopenshell.util.placement.rotation(90, "X") @ matrix
+    # Slope of roof, keep level
+    #matrix = ifcopenshell.util.placement.rotation(-10,"Z") @ matrix
+
+    matrix[:,3][0:3] = (0, 5.3, 0)
+
+    # Give our slab a local origin at (0, 0, 0) USING MATRIX?
+    ifcopenshell.api.geometry.edit_object_placement(file, product=roof, matrix=matrix, is_si=True)
+
+    # REPRESENTATION
+    # Add a new slab-like body geometry, 200mm thick, flat
+    profile = file.create_entity("IfcRectangleProfileDef", ProfileName="4000x4000", ProfileType="AREA", XDim=4000, YDim=4000)
+    representation = ifcopenshell.api.geometry.add_profile_representation(file, context=body, profile=profile, depth=0.1)
+
+    # Add a new roof-like body geometry, 200mm thick, flat
+    # representation = ifcopenshell.api.geometry.add_slab_representation(file, context=body, depth=0.2, x_angle = 10.0)
+    
+    # Assign our new body geometry back to our roof
+    ifcopenshell.api.geometry.assign_representation(file, product=roof, representation=representation)
+
+    # Place our roof in the ground floor
+    ifcopenshell.api.spatial.assign_container(file, products=[roof], relating_structure=storey)
+
+    return file

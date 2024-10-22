@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    obj
+{% endblock %}
+
+{% block main %}
+
+    <!--<form action="/model" method="post"> 
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="model" placeholder="model_name" type="text" style="text-align:center">
+        </div>
+        <button class="btn btn-primary" type="submit">New Model</button>
+    </form>-->
+
+    <form action="/obj" method="post" class="form-group">
+        <p></p>
+        <button type="submit" class="btn btn-primary mt-2">Model IFC</button>
+        <p></p>
+        <select name="dropdown" class="btn btn-outline-primary mt-2" id="dropdown" class="form-control">
+            <option value="Wall">Wall.ifc</option>
+            <option value="Slab1">Slab1.ifc</option>
+            <option value="Slab2">Slab2.ifc</option>
+            <option value="Beam1">Beam1.ifc</option>
+            <option value="Beam2">Beam2.ifc</option>                
+            <option value="Roof">Roof.ifc</option>
+        </select>
+
+        <p></p>
+        <p></p>
+
+        <div style="background-color: rgb(0, 158, 156); color:white;padding:10px;">
+            <p style="text-align:center; font: size 20px;"><h2>Object file (OBJ)</h2></p>
+            <p>OBJ file format. A simple data-format that represents 3D geometry alone — namely, the position of each vertex, the UV position of each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of vertices, and texture vertices.</p>
+        </div>
+
+    </form>
+
+{% endblock %}

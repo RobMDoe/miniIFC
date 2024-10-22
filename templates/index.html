@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    index
+{% endblock %}
+
+{% block main %}
+
+    <table class = "table table-striped">
+
+        <thead>
+            <tr>
+                <th class="text-center">ifc</th>
+                <th class="text-center">obj</th>
+                <th class="text-center">user_id</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for row in all %}
+            <tr>
+                <td class="text-center">{{ row.ifc_name }}</td>
+                <td class="text-center">{{ row.obj_name }}</td>
+                <td class="text-center">{{ row.user_id }}</td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+{% endblock %}

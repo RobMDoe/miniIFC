@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    spf
+{% endblock %}
+
+{% block main %}
+
+    <form action="/geo" method="post" class="form-group">
+        <p></p>
+        <button type="submit" class="btn btn-primary mt-2">Geometry IFC</button>
+        <p></p>
+        <select name="dropdown" class="btn btn-outline-primary mt-2" id="dropdown" class="form-control">
+            <option value="Wall">Wall.ifc</option>
+            <option value="Slab1">Slab1.ifc</option>
+            <option value="Slab2">Slab2.ifc</option>
+            <option value="Beam1">Beam1.ifc</option>
+            <option value="Beam2">Beam2.ifc</option>                
+            <option value="Roof">Roof.ifc</option>
+        </select>
+
+        <p></p>
+        <p></p>
+
+        <div style="background-color: rgb(0, 158, 156); color:white;padding:10px;">
+            <p style="text-align:center; font: size 20px;"><h2>WEBGL2</h2></p>
+            <p>OBJ tesselated geometry view</p>
+        </div>
+
+    </form>
+
+
+{% endblock %}
