@@ -13,9 +13,10 @@ import ifcopenshell.api.aggregate
 
 from helpers import apology, login_required
 import os
+import sys
 import shutil
 
-from ifcFiles import ifcWall, ifcSlab1, ifcSlab2, ifcBeam1, ifcBeam2, ifcRoof #ifcColumn
+from ifcFiles import ifcWall, ifcSlab1, ifcSlab2, ifcSlab3, ifcBeam1, ifcBeam2, ifcRoof, ifcColumn, ifcStair
 
 # Configure application
 app = Flask(__name__)
@@ -173,6 +174,14 @@ def ifc():
             elif ifc_name == "Slab2":
 
                 file = ifcSlab2()
+
+            elif ifc_name == "Slab3":
+
+                file = ifcSlab3()
+            
+            elif ifc_name == "Column":
+
+                file = ifcColumn()
                 
             elif ifc_name == "Beam1":
 
@@ -186,9 +195,9 @@ def ifc():
 
                 file = ifcRoof()
 
-            #elif ifc_name == "Column":
+            elif ifc_name == "Stair":
 
-                #file = ifcColumn()
+                file = ifcStair()
                 
             file.write("ifc_files/" + ifc_name + ".ifc")
             file.write("ifc_files/" + ifc_name + ".txt")
@@ -228,7 +237,19 @@ def spf():
             with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)
+            
+        elif ifc_name == "Slab3":
 
+            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+                lines = file.readlines()
+                return render_template("ascii.html", lines=lines)
+            
+        elif ifc_name == "Column":
+
+            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+                lines = file.readlines()
+                return render_template("ascii.html", lines=lines)            
+        
         elif ifc_name == "Beam1":
 
             with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
@@ -241,17 +262,17 @@ def spf():
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)
             
-        elif ifc_name == "Column":
-
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
-                lines = file.readlines()
-                return render_template("ascii.html", lines=lines)
-            
         elif ifc_name == "Roof":
 
             with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
                 lines = file.readlines()
-                return render_template("ascii.html", lines=lines)            
+                return render_template("ascii.html", lines=lines)
+
+        elif ifc_name == "Stair":
+
+            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+                lines = file.readlines()
+                return render_template("ascii.html", lines=lines)                      
 
     else:
             return render_template("spf.html")
@@ -336,6 +357,30 @@ def obj():
             # convert ifc to obj
             os.system('cmd /c IfcConvert "ifc_files/Slab2.ifc" "static/Slab2.obj"')
 
+        if ifc_name == "Slab3":
+
+            # if exists, delete or overwrite existing Wall.obj, Wall.mtl
+            if os.path.exists("static/Slab3.obj"):
+                os.remove("static/Slab3.obj")
+            
+            if os.path.exists("static/Slab3.mtl"):
+                os.remove("static/Slab3.mtl")
+
+            # convert ifc to obj
+            os.system('cmd /c IfcConvert "ifc_files/Slab3.ifc" "static/Slab3.obj"')
+
+        if ifc_name == "Column":
+
+            # if exists, delete or overwrite existing Wall.obj, Wall.mtl
+            if os.path.exists("static/Column.obj"):
+                os.remove("static/Column.obj")
+            
+            if os.path.exists("static/Column.mtl"):
+                os.remove("static/Column.mtl")
+
+            # convert ifc to obj
+            os.system('cmd /c IfcConvert "ifc_files/Column.ifc" "static/Column.obj"')
+
         if ifc_name == "Beam1":
 
             # if exists, delete or overwrite existing Wall.obj, Wall.mtl
@@ -360,18 +405,6 @@ def obj():
             # convert ifc to obj
             os.system('cmd /c IfcConvert "ifc_files/Beam2.ifc" "static/Beam2.obj"')
 
-        if ifc_name == "Column":
-
-            # if exists, delete or overwrite existing Wall.obj, Wall.mtl
-            if os.path.exists("static/Column.obj"):
-                os.remove("static/Column.obj")
-            
-            if os.path.exists("static/Column.mtl"):
-                os.remove("static/Column.mtl")
-
-            # convert ifc to obj
-            os.system('cmd /c IfcConvert "ifc_files/Column.ifc" "static/Column.obj"')
-
         if ifc_name == "Roof":
 
             # if exists, delete or overwrite existing Wall.obj, Wall.mtl
@@ -384,8 +417,23 @@ def obj():
             # convert ifc to obj
             os.system('cmd /c IfcConvert "ifc_files/Roof.ifc" "static/Roof.obj"')
 
-        return redirect("/")
 
+        if ifc_name == "Stair":
+
+            # if exists, delete or overwrite existing Wall.obj, Wall.mtl
+            if os.path.exists("static/Stair.obj"):
+                os.remove("static/Stair.obj")
+            
+            if os.path.exists("static/Stair.mtl"):
+                os.remove("static/Stair.mtl")
+
+            # convert ifc to obj
+            os.system('cmd /c IfcConvert "ifc_files/Stair.ifc" "static/Stair.obj"')
+
+
+        return redirect("/")
+    
+    
     else:
 
         return render_template("obj.html")
@@ -396,39 +444,71 @@ def obj():
 def geo():
     """create and view GEOMETRY"""
 
+    #set session
+    user_id = session["user_id"]
+
     if request.method == "POST":
 
         # user creates ifc geometry 'Wall.obj', 'Slab1.obj', 'Slab2.obj', Roof.obj', 
         # 'Beam1.obj', 'Beam2.obj', 'Column.obj'
-        ifc_name = request.form.get("dropdown")
-                      
-        if ifc_name == "Wall":
+        request.form.get("Geometry")
+        return render_template("render.html")
+    
+        # "wall.obj", "slab1.obj" etc.
 
-            return render_template("render.html")
-                            
-        elif ifc_name == "Slab1":
+        # objects that exist so far
+        obj_names = db.execute("SELECT obj_name FROM ifcobj WHERE user_id = ?", user_id)
+        print(obj_names)
 
-            return render_template("render.html")
+        # print one object
+        #if obj_name in obj_names["obj_name"]: #iterate?
+            #return render_template("render.html") 
+        # render all objects
+        #for obj in obj_names:
+            #if obj["obj_name"] == obj_name:
+                #return render_template("render.html") # pass in value, obj_name "Wall.ifc"
+            #else:
+                #return render_template("geo.html")
+
+        #for n in all_name:
+
+            #if n == ifc_name:
+            
+                #return render_template("render.html")
+
+        #elif ifc_name == "Wall":
+
+            #return render_template("render.html")
+                                  
+        #elif ifc_name == "Slab1":
+
+            #return render_template("render.html")
         
-        elif ifc_name == "Slab2":
+        #elif ifc_name == "Slab2":
 
-            return render_template("render.html")
+            #return render_template("render.html")
+        
+        #elif ifc_name == "Slab3":
+
+            #return render_template("render.html")
                   
-        elif ifc_name == "Beam1":
+        #elif ifc_name == "Beam1":
 
-            return render_template("render.html")
+            #return render_template("render.html")
         
-        elif ifc_name == "Beam2":
+        #elif ifc_name == "Beam2":
 
-            return render_template("render.html")
+            #return render_template("render.html")
 
-        elif ifc_name == "Column":
+        #elif ifc_name == "Column":
 
-            return render_template("render.html")
+            #return render_template("render.html")
          
-        elif ifc_name == "Roof":
+        #elif ifc_name == "Roof":
 
-            return render_template("render.html")       
+            #return render_template("render.html")
+        
+        #else: exit
 
     else:
             return render_template("geo.html")

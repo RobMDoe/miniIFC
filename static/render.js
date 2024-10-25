@@ -3,8 +3,6 @@ import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
-//import { TransformControls } from 'three/addons/controls/TransformControls.js';
-
 main()
 
 function main() {
@@ -61,16 +59,115 @@ function main() {
 
   const loader = new OBJLoader();
 
-  var walls, beams;
-
-  function applyTransforms(object) {
-    object.scale.x = 0.042;
-    object.scale.y = 0.04;
-  }
+  var slab1, slab2, slab3, column, walls, beam1, beam2, roof, stair;
 
   //"It looks like you're trying to create a THREE.Mesh with walls, 
   // but walls might not be a geometry. Instead, try accessing the first 
   // child of object if it exists:" (Duck Debugger)
+
+  // Level 1 floor build-up
+  loader.load('static/Slab1.obj', function(object) {
+    console.log(object.children.length); // Check if there are children
+    if (object.children.length > 0) {
+      const slabMat = new THREE.MeshStandardMaterial({
+        color: 0xc8c6c5,
+        flatShading: true,
+      });
+
+      slab1 = object.children[0]; // Use the first child
+      const mesh = new THREE.Mesh(slab1.geometry,slabMat); // Use the geometry of the child
+      const edges = new THREE.EdgesGeometry(slab1.geometry); 
+      const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0x949494, linewidth: 0.2 } ) ); 
+      scene.add( line );      
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      scene.add(mesh);
+      next();
+    } else {
+      console.error("No children found in the loaded object.");
+    }
+  });
+
+  // Level 2 floor build-up
+  loader.load('static/Slab2.obj', function(object) {
+    console.log(object.children.length); // Check if there are children
+    if (object.children.length > 0) {
+      const slabMat = new THREE.MeshStandardMaterial({
+        color: 0xc8c6c5,
+        flatShading: true,
+      });
+
+      slab2 = object.children[0]; // Use the first child
+      const mesh = new THREE.Mesh(slab2.geometry,slabMat); // Use the geometry of the child
+      const edges = new THREE.EdgesGeometry(slab2.geometry); 
+      const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0x949494, linewidth: 0.2 } ) ); 
+      scene.add( line ); 
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      scene.add(mesh);
+      next();
+    } else {
+      console.error("No children found in the loaded object.");
+    }
+  });
+
+  // Level 2 landing
+  loader.load('static/Slab3.obj', function(object) {
+    console.log(object.children.length); // Check if there are children
+    if (object.children.length > 0) {
+      const slabMat = new THREE.MeshStandardMaterial({
+        color: 0xc8c6c5,
+        metalness: 1.0,
+        flatShading: true,
+      });
+
+      slab3 = object.children[0]; // Use the first child
+      const mesh = new THREE.Mesh(slab3.geometry,slabMat); // Use the geometry of the child
+      const edges = new THREE.EdgesGeometry(slab3.geometry); 
+      const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0x949494, linewidth: 0.2 } ) ); 
+      scene.add( line ); 
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      scene.add(mesh);
+      next();
+    } else {
+      console.error("No children found in the loaded object.");
+    }
+  });
+
+  // Columns
+  loader.load('static/Column.obj', function(object) {
+    console.log(object.children.length); // Check if there are children
+    if (object.children.length > 0) {
+      const colMat = new THREE.MeshStandardMaterial({
+        color: 0x949494,
+        metalness: 0.5,
+        flatShading: true
+      });
+
+      column = object.children[0]; // Use the first child
+      const meshA = new THREE.Mesh( column.geometry, colMat ); meshA.position.set( 1.925, 0, 0 ); 
+      const meshB = new THREE.Mesh( column.geometry, colMat ); meshB.position.set( 1.925, 0, 1.95 );
+      const meshC = new THREE.Mesh( column.geometry, colMat ); meshC.position.set( 1.925, 0, -1.95 );
+      
+      meshA.castShadow = true;
+      meshA.receiveShadow = true;
+      meshB.castShadow = true;
+      meshB.receiveShadow = true;
+      meshC.castShadow = true;
+      meshC.receiveShadow = true;
+  
+      const group = new THREE.Group(); 
+      group.add( meshA ); 
+      group.add( meshB );
+      group.add( meshC );      
+      scene.add( group );
+      scene.add(mesh);
+      next();
+    } else {
+      console.error("No children found in the loaded object.");
+    }
+  });
 
   loader.load('static/Wall.obj', function(object) {
     console.log(object.children.length); // Check if there are children
@@ -79,9 +176,14 @@ function main() {
         color: 0xc8c6c5,
         flatShading: true,
       });
-      applyTransforms(object);
+
       walls = object.children[0]; // Use the first child
       const mesh = new THREE.Mesh(walls.geometry, wallMat); // Use the geometry of the child
+      const edges = new THREE.EdgesGeometry(walls.geometry);
+      const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0x949494, linewidth: 0.2 } ) ); 
+      scene.add( line ); 
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
       scene.add(mesh);
       next();
     } else {
@@ -89,16 +191,105 @@ function main() {
     }
   });
 
+  // Roof beams
   loader.load('static/Beam1.obj', function(object) {
     console.log(object.children.length); // Check if there are children
+    
     if (object.children.length > 0) {
       const beamMat = new THREE.MeshStandardMaterial({
+        color: 0x949494,
+        metalness: 0.5,
+        flatShading: true
+      });
+      
+      beam1 = object.children[0]; // Use the first child
+      const meshA = new THREE.Mesh( beam1.geometry, beamMat ); meshA.position.set( 0, 0, 0 ); 
+      const meshB = new THREE.Mesh( beam1.geometry, beamMat ); meshB.position.set( 0, 0, 1.95 );
+      const meshC = new THREE.Mesh( beam1.geometry, beamMat ); meshC.position.set( 0, 0, -1.95 );   
+      
+      meshA.castShadow = true;
+      meshA.receiveShadow = true;
+      meshB.castShadow = true;
+      meshB.receiveShadow = true;
+      meshC.castShadow = true;
+      meshC.receiveShadow = true;
+  
+      const group = new THREE.Group(); 
+      group.add( meshA ); 
+      group.add( meshB );
+      group.add( meshC );      
+      scene.add( group );
+
+      //scene.add(mesh);
+      next();
+    } else {
+      console.error("No children found in the loaded object.");
+    }
+  });
+
+  // Level 1 & 2 beams
+  loader.load('static/Beam2.obj', function(object) {
+    console.log(object.children.length); // Check if there are children
+    
+    if (object.children.length > 0) {
+      const beamMat = new THREE.MeshStandardMaterial({
+        color: 0x949494, 
+        metalness: 0.5,
+        flatShading: true
+      });
+      
+      beam2 = object.children[0]; // Use the first child
+      const meshA = new THREE.Mesh( beam2.geometry, beamMat ); meshA.position.set( 0, 0, 0 ); 
+      const meshB = new THREE.Mesh( beam2.geometry, beamMat ); meshB.position.set( 0, 0, 1.95 );
+      const meshC = new THREE.Mesh( beam2.geometry, beamMat ); meshC.position.set( 0, 0, -1.95 );   
+      const meshD = new THREE.Mesh( beam2.geometry, beamMat ); meshD.position.set( 0, 2.5, 0 ); 
+      const meshE = new THREE.Mesh( beam2.geometry, beamMat ); meshE.position.set( 0, 2.5, 1.95 );
+      const meshF = new THREE.Mesh( beam2.geometry, beamMat ); meshF.position.set( 0, 2.5, -1.95 );
+
+      meshA.castShadow = true;
+      meshA.receiveShadow = true;
+      meshB.castShadow = true;
+      meshB.receiveShadow = true;
+      meshC.castShadow = true;
+      meshC.receiveShadow = true;
+      meshD.castShadow = true;
+      meshD.receiveShadow = true;
+      meshE.castShadow = true;
+      meshE.receiveShadow = true;
+      meshF.castShadow = true;
+      meshF.receiveShadow = true;
+  
+      const group = new THREE.Group(); 
+      group.add( meshA ); 
+      group.add( meshB );
+      group.add( meshC );
+      group.add( meshD ); 
+      group.add( meshE );
+      group.add( meshF );    
+      scene.add( group );
+
+      next();
+    } else {
+      console.error("No children found in the loaded object.");
+    }
+  });
+
+  // Roof build-up
+  loader.load('static/Roof.obj', function(object) {
+    console.log(object.children.length); // Check if there are children
+    if (object.children.length > 0) {
+      const roofMat = new THREE.MeshStandardMaterial({
         color: 0xc8c6c5,
         flatShading: true,
       });
-      applyTransforms(object);
-      beams = object.children[0]; // Use the first child
-      const mesh = new THREE.Mesh(beams.geometry, beamMat); // Use the geometry of the child
+
+      roof = object.children[0]; // Use the first child
+      const mesh = new THREE.Mesh(roof.geometry,roofMat); // Use the geometry of the child
+      const edges = new THREE.EdgesGeometry(roof.geometry);
+      const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0x949494, linewidth: 0.2 } ) ); 
+      scene.add(line);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
       scene.add(mesh);
       next();
     } else {
@@ -106,184 +297,81 @@ function main() {
     }
   });
 
+  // Stairs
+  loader.load('static/Stair.obj', function(object) {
+    console.log(object.children.length); // Check if there are children
+    
+    if (object.children.length > 0) {
+      const stairMat = new THREE.MeshStandardMaterial({
+        color: 0xc8c6c5,
+        metalness: 1.0,
+        flatShading: true
+      });
+    
+      stair = object.children[0]; // Use the first child. Make loops
+      const edges = new THREE.EdgesGeometry(stair.geometry);
+      const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0xc8c6c5, linewidth: 0.2 } ) ); 
+     
+      const mesh = [];
+      console.log(mesh);
+      let m = 0.00;
+      let n = 0.541071;
+      for (let i = 0; i < 13; i++) {
+        mesh[i] = new THREE.Mesh( stair.geometry, stairMat ); mesh[i].position.set( m, n);
+        scene.add(line);
+        m += 0.165; 
+        n += 0.17857;
+      }
+
+      for (let i = 0; i < 13; i++) {
+        mesh[i].castShadow = true;
+        mesh[i].receiveShadow = true;
+      }
+  
+      const group = new THREE.Group(); 
+      for (let i = 0; i < 13; i++) {
+        group.add( mesh[i] );
+      }
+
+      //const a = new THREE.Vector3( 0, 1, 0 );
+      scene.add(group)  //.rotateOnAxis(a, 0));
+
+      next();
+    } else {
+      console.error("No children found in the loaded object.");
+    }
+  });
 
   // allows previous function to fully load
   function next() {
-    if (walls && beam) {
+    if (slab1) {
+      console.log('done');
+    }
+    if (slab2) {
+      console.log('done');
+    }
+    if (slab3) {
+      console.log('done');
+    }
+    if (column) {
+      console.log('done');
+    }
+    if (walls) {
+      console.log('done');
+    }
+    if (beam1) {
+      console.log('done');
+    }
+    if (beam2) {
+      console.log('done');
+    }
+    if (roof) {
+      console.log('done');
+    }
+    if (stair) {
       console.log('done');
     }
   }
-/*
-  // ORIGINAL OBJ LOADER FUNCTION
-  
-  // Geometry object + material, called by function
-  // Buffer geometry passed in (obj?)
-  function init(geometry) {
-
-    console.log(geometry);
-   
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xc8c6c5,
-      flatShading: true,
-    });
-    
-    const mesh = new THREE.Mesh(geometry, material); 
-    const edges = new THREE.EdgesGeometry( geometry ); 
-    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0xa39f9e } ) );
-    scene.add( line );
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    scene.add(mesh);
-    
-  }
-
-  // initiate obj loader
-  const loader = new OBJLoader();
-  // call geometry function when loader loaded (import as buffer geometry)
-  loader.load('static/Wall.obj', (obj) => init(obj.children[0].geometry));
-  loader.load('static/Slab1.obj', (obj) => init(obj.children[0].geometry));
-  loader.load('static/Slab2.obj', (obj) => init(obj.children[0].geometry));
-  loader.load('static/Roof.obj', (obj) => init(obj.children[0].geometry));
-  loader.load('static/Beam1.obj', (obj) => init(obj.children[0].geometry));
-  loader.load('static/Beam2.obj', (obj) => init(obj.children[0].geometry));
-
-
-  //function init(beams) {
-
-    //console.log(beams);
-   
-    //const material = new THREE.MeshStandardMaterial({
-      //color: 0xc8c6c5,
-      //flatShading: true
-    //});
-    
-    //const mesh2 = new THREE.Mesh( beams, material );
-    //const beamA = new THREE.Mesh( mesh, material ); beamA.position.set( 2.0, 0, 0 );
-    //const beamB = new THREE.Mesh( mesh, material ); beamB.position.set( 4.0, 0, 0 );
-    //const group = new THREE.Group(); group.add( beamA ); group.add( beamB );
-    //const edges = new THREE.EdgesGeometry( mesh ); 
-    //const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0xa39f9e } ) );
-    //scene.add( line );
-    //mesh.castShadow = true;
-    //mesh.receiveShadow = true;
-    //scene.add( mesh2 );
-    
-  //} 
-   
-  // initiate obj loader for beams
-  //const loadB = new OBJLoader();
-  //loadB.load('static/Beam1.obj', (obj) => init(obj.children[0].beams));
-  //loadB.load('static/Beam2.obj', (obj) => init(obj.children[0].beams));
-
-  */
-
-  /*
-  //ALTERNATIVE OBJ LOADER GROUP APPROACH - WALLS
-  // CLONE, GROUP, ARRAY ???
-
-  const loader = new OBJLoader();
-
-  var walls, beams;
-
-  function applyTransforms(object) {
-    object.scale.x = 0.042;
-    object.scale.y = 0.04;
-  }
-
-  loader.load('static/Wall.obj', function(object) {
-    const wallMat = new THREE.MeshStandardMaterial({
-      color: 0xc8c6c5,
-      flatShading: true,
-    });
-    applyTransforms(object);
-    walls = object;
-    const mesh = new THREE.Mesh(walls, wallMat);
-    scene.add (mesh )
-    next();
-  });
-
-  loader.load('static/Beam1.obj', function(object) {
-    const beamMat = new THREE.MeshStandardMaterial({
-      color: 0xc8c6c5,
-      flatShading: true,
-    });
-    applyTransforms(object);
-    beams = object;
-    const mesh = new THREE.Mesh(beams, beamMat);
-    scene.add (mesh )
-    next();
-  });
-
-  function next() {
-    if (walls && beams) {
-      console.log('done');
-    }
-  }
-
-  /*function init(geometry) {
-
-    console.log(geometry);  
-  
-    const material1 = new THREE.MeshStandardMaterial({
-      color: 0xc8c6c5,
-      flatShading: true,
-    });
-
-    //const mesh = new THREE.Mesh(geometry, material); 
-    //const edges = new THREE.EdgesGeometry( geometry ); 
-    //const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0xa39f9e } ) );
-    //scene.add( line );
-    const wallA = new THREE.Mesh( geometry, material1 ); wallA.position.set( 2, 0, 2 ); 
-    const wallB = new THREE.Mesh( geometry, material1 ); wallB.position.set( 4, 0, 4 );
-    wallA.castShadow = true;
-    wallA.receiveShadow = true;
-    wallB.castShadow = true;
-    wallB.receiveShadow = true;
-  
-    const group = new THREE.Group(); 
-    group.add( wallA ); group.add( wallB ); 
-    scene.add( group );
-    
-  }
-
-  const loadA = new OBJLoader();
-  // call geometry function when loader loaded (import as buffer geometry)
-  loadA.load('static/Wall.obj', (obj) => init(obj.children[0].geometry));
-
-
-  //ALTERNATIVE OBJ LOADER GROUP APPROACH - BEAMS
-
-  function init(beams) {
-
-    console.log(beams);  
-  
-    const material2 = new THREE.MeshStandardMaterial({
-      color: 0x000000,
-      flatShading: true,
-    });
-
-    //const mesh = new THREE.Mesh(geometry, material); 
-    //const edges = new THREE.EdgesGeometry( geometry ); 
-    //const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0xa39f9e } ) );
-    //scene.add( line );
-    const beamA = new THREE.Mesh( beams, material2 ); beamA.position.set( 2, 5, 2 ); 
-    const beamB = new THREE.Mesh( beams, material2 ); beamB.position.set( 4, 5, 4 );
-    beamA.castShadow = true;
-    beamA.receiveShadow = true;
-    beamA.castShadow = true;
-    beamB.receiveShadow = true;
-  
-    const group = new THREE.Group(); 
-    group.add( beamA ); group.add( beamB ); 
-    scene.add( group );
-    
-  }
-  
-  const loadB = new OBJLoader();
-  // call geometry function when loader loaded (import as buffer geometry)
-  loadB.load('static/Beam1.obj', (obj) => init(obj.children[0].beams));
-
-  */
 
   // directional light
   const dLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -304,7 +392,7 @@ function main() {
   scene.add(aLight);
 
   // Add plane
-  const planeGeometry = new THREE.PlaneGeometry( 14, 14 );
+  const planeGeometry = new THREE.PlaneGeometry( 12, 12 );
   const planeMaterial = new THREE.MeshStandardMaterial({ 
     color: 0xffffff,
     side: THREE.DoubleSide,
@@ -321,7 +409,7 @@ function main() {
   //scene.add(axesHelper);
   
   // Grid helper
-  const gridHelper = new THREE.GridHelper(14, 14);
+  const gridHelper = new THREE.GridHelper(12, 12);
   const gridMaterial = new THREE.MeshBasicMaterial({ 
     color: 0x000000,
     side: THREE.DoubleSide
