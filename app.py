@@ -151,62 +151,39 @@ def ifc():
         # user creates an ifc file 'Wall.ifc', 'Pipe.ifc', 'Plate.ifc'
         ifc_name = request.form.get("dropdown")
 
-        if ifc_name  == "Wall" or "Slab1" or "Slab2" or "Roof" or "Beam1" or "Beam2" or "Column":
+        # if file_name exists in db issue alert 
+        ifc_name = ifc_name + ".ifc"
+        try:
+            db.execute("INSERT INTO ifcobj (ifc_name, user_id) VALUES (?, ?)", ifc_name, user_id)
+        except:
+            # catch duplicates
+            print("An exception occurred")
         
-            # if file_name exists in db then delete row and issue alert "Choose alternative ifc type"
-            # else, make ifc file, either Wall, Slab, Roof
-            # Store Wall.ifc file name on home page in SQL database miniifc.db table 'store'
-            
-            try:
-                db.execute("INSERT INTO ifcobj (ifc_name, user_id) VALUES (?, ?)", ifc_name + ".ifc", user_id)
-            except:
-                # catch duplicates
-                print("An exception occurred") 
-                       
-            if ifc_name == "Wall":
+        ifc_name = ifc_name.replace(".ifc", "")
 
-                file = ifcWall()
-                              
-            elif ifc_name == "Slab1":
+        function_map = {
+            "Wall": ifcWall,
+            "Slab1": ifcSlab1,
+            "Slab2": ifcSlab2,
+            "Slab3": ifcSlab3,
+            "Beam1": ifcBeam1,
+            "Beam2": ifcBeam2,
+            "Roof": ifcRoof,
+            "Column": ifcColumn,
+            "Stair": ifcStair
+        }
 
-                file = ifcSlab1()
+        file = function_map[ifc_name]()
 
-            elif ifc_name == "Slab2":
-
-                file = ifcSlab2()
-
-            elif ifc_name == "Slab3":
-
-                file = ifcSlab3()
-            
-            elif ifc_name == "Column":
-
-                file = ifcColumn()
-                
-            elif ifc_name == "Beam1":
-
-                file = ifcBeam1()
+        ifc_name = ifc_name.replace("ifc", "")
         
-            elif ifc_name == "Beam2":
-
-                file = ifcBeam2()
-
-            elif ifc_name == "Roof":
-
-                file = ifcRoof()
-
-            elif ifc_name == "Stair":
-
-                file = ifcStair()
-                
-            file.write("ifc_files/" + ifc_name + ".ifc")
-            file.write("ifc_files/" + ifc_name + ".txt")
-        
-        return redirect ("/")
-            
-        
-    else:
+        file.write("ifc_files/" + ifc_name + ".ifc")
+        file.write("ifc_files/" + ifc_name + ".txt")
     
+        return redirect ("/")
+
+    else:
+
         return render_template("ifc.html")
 
 
@@ -457,8 +434,8 @@ def geo():
         # "wall.obj", "slab1.obj" etc.
 
         # objects that exist so far
-        obj_names = db.execute("SELECT obj_name FROM ifcobj WHERE user_id = ?", user_id)
-        print(obj_names)
+        #obj_names = db.execute("SELECT obj_name FROM ifcobj WHERE user_id = ?", user_id)
+        #print(obj_names)
 
         # print one object
         #if obj_name in obj_names["obj_name"]: #iterate?
