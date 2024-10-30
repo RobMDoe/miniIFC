@@ -276,7 +276,7 @@ def ifcBeam1():
 
     # REPRESENTATION
     profile = file.create_entity("IfcRectangleProfileDef", ProfileName="100x200", ProfileType="AREA", XDim=100, YDim=200)
-    representation = ifcopenshell.api.geometry.add_profile_representation(file, context=body, profile=profile, depth=4.3)
+    representation = ifcopenshell.api.geometry.add_profile_representation(file, context=body, profile=profile, depth=4.15)
     
     # ASSIGN REPRESENTATION BACK 
     ifcopenshell.api.geometry.assign_representation(file, product=beam1, representation=representation)
@@ -320,7 +320,7 @@ def ifcBeam2():
 
     # REPRESENTATION
     profile = file.create_entity("IfcRectangleProfileDef", ProfileName="100x200", ProfileType="AREA", XDim=100, YDim=200)
-    representation = ifcopenshell.api.geometry.add_profile_representation(file, context=body, profile=profile, depth=4.0)
+    representation = ifcopenshell.api.geometry.add_profile_representation(file, context=body, profile=profile, depth=3.85)
     
     # ASSIGN REPRESENTATION BACK 
     ifcopenshell.api.geometry.assign_representation(file, product=beam2, representation=representation)

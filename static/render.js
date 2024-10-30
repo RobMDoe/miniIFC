@@ -41,7 +41,9 @@ function main() {
   const near = 0.001;
   const far = 1000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far); 
-  camera.position.set(5, 5, -10);
+  camera.position.set(0, 5, 10);
+  camera.lookAt(0, 0, 0);
+  camera.layers.enable(1);
 
   // Label Renderer
   const labelRenderer = new CSS2DRenderer();
@@ -64,57 +66,56 @@ function main() {
   controls.dampingFactor = 0.02;
  
   // Paragraph example for Label Renderer
-  const p = document.createElement('p');
-  p.textContent = 'Hello';
+  // const p = document.createElement('p');
+  // p.textContent = 'Hello';
   // const cPointLabel = new CSS2DObject(p);
   // scene.add(cPointLabel);
   // cPointLabel.position.set(4,4,4);
 
   // Contain label in div
-  const div = document.createElement('div');
-  div.appendChild(p);
-  const divContainer = new CSS2DObject(div);
-  scene.add(divContainer);
+  // const div = document.createElement('div');
+  // div.appendChild(p);
+  // const divContainer = new CSS2DObject(div);
+  // scene.add(divContainer);
 
 
   // END OF SCENE SET UP
 
-  var slab1, slab2, slab3, column, wall, beam1, beam2, roof, stair;
 
-
-  //"It looks like you're trying to create a THREE.Mesh with walls, 
-  // but walls might not be a geometry. Instead, try accessing the first 
-  // child of object if it exists:" (Duck Debugger)
+  var wall, slab1, slab2, slab3, column, beam1, beam2, roof, stair;
 
   // Create mesh function, for all objects
-  function createMesh(geometry, material, name) {
+  function createMesh(geometry, material, name, layer) {
+    material.side = THREE.DoubleSide; // Make the material double-sided
     const mesh = new THREE.Mesh(geometry, material.clone());
     mesh.name = name;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-
+    mesh.layers.set(layer);
+    const edges = new THREE.EdgesGeometry( geometry ); 
+    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0x7f7f7f, linewidth: 0.05 } ) ); mesh.add( line );
+      
     return mesh;
   }
 
-    //const edges = new THREE.EdgesGeometry(slab2.geometry); 
-    //const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0x949494, linewidth: 0.2 } ) ); 
-    //scene.add(line)
-
 
   // Materials
-  const slabMat = new THREE.MeshStandardMaterial({
-    color: 0xc8c6c5,
-    flatShading: true,
-  });
+   const slabMat = new THREE.MeshStandardMaterial({
+     color: 0xc8c6c5,
+     side: THREE.DoubleSide,
+     flatShading: true,
+   });
 
   const wallMat = new THREE.MeshStandardMaterial({
     color: 0xc8c6c5,
+    side: THREE.DoubleSide,
     metalness: 0.5,
     flatShading: true,
   });
 
-  const stairMat = new THREE.MeshStandardMaterial({
+  const steelMat = new THREE.MeshStandardMaterial({
     color: 0xc8c6c5,
+    side: THREE.DoubleSide,
     metalness: 1.0,
     flatShading: true
   });
@@ -124,8 +125,50 @@ function main() {
 
   // Group of all objects
   const group = new THREE.Group();
-  console.log(group);
+  // console.log(group);
+
   scene.add(group)
+
+  const w_group = new THREE.Group();
+  group.add(w_group);
+
+  const s1_group = new THREE.Group();
+  group.add(s1_group);
+
+  const s2_group = new THREE.Group();
+  group.add(s2_group);
+
+  // const c_group = new THREE.Group();
+  // group.add(c_group);
+
+  //"It looks like you're trying to create a THREE.Mesh with walls, 
+  // but walls might not be a geometry. Instead, try accessing the first 
+  // child of object if it exists:" (CS50 Duck Debugger)
+
+  // WALL 
+  function createWall(loader, createMesh, next, callback) {
+    loader.load('static/Wall.obj', function(object) {
+      console.log(object.children.length); // Check if there are children
+      if (object.children.length > 0) {
+        let wall = object.children[0]; // Use the first child
+        wall.name = 'Wall';
+        wall.add(createMesh(wall.geometry, wallMat, 'Wall', 1));
+        next();
+        callback(wall); //wall_1? // returns wall object?
+      } else {
+        console.error("No children found in the loaded object.");
+      }
+    });
+  }
+
+  // Usage // Calls function createWall
+  createWall(loader, createMesh, next, function(w_Add) {
+    console.log(w_Add);
+    w_group.add(w_Add);
+  });
+
+
+  // ISOLATE WALL FOR NOW ------------------
 
   // LEVEL 1 FLOOR BUILD-UP
   function createSlab1(loader, createMesh, next, callback) {
@@ -133,7 +176,8 @@ function main() {
       console.log(object.children.length); // Check if there are children
       if (object.children.length > 0) {
         let slab1 = object.children[0]; // Use the first child
-        slab1.add(createMesh(slab1.geometry, slabMat, 'Slab1'));
+        slab1.name = 'Slab1';
+        slab1.add(createMesh(slab1.geometry, slabMat, 'Slab1', 1));
         next();
         callback(slab1);
       } else {
@@ -143,10 +187,11 @@ function main() {
   }
   
   // Usage
-  createSlab1(loader, createMesh, next, function(slab_1) {
-    console.log(slab_1);
-    group.add(slab_1);
+  createSlab1(loader, createMesh, next, function(s1_Add) {
+    console.log(s1_Add);
+    s1_group.add(s1_Add);
   });
+
 
   // LEVEL 2 FLOOR BUILD-UP
   function createSlab2(loader, createMesh, next, callback) {
@@ -154,7 +199,8 @@ function main() {
       console.log(object.children.length); // Check if there are children
       if (object.children.length > 0) {
         let slab2 = object.children[0]; // Use the first child
-        slab2.add(createMesh(slab2.geometry, slabMat, 'Slab2'));
+        slab2.name = 'Slab2';
+        slab2.add(createMesh(slab2.geometry, slabMat, 'Slab2', 1));
         next();
         callback(slab2);
       } else {
@@ -164,10 +210,11 @@ function main() {
   }
 
   // Usage
-  createSlab2(loader, createMesh, next, function(slab_2) {
-    console.log(slab_2);
-    group.add(slab_2);
+  createSlab2(loader, createMesh, next, function(s2_Add) {
+    console.log(s2_Add);
+    s2_group.add(s2_Add);
   });
+
 
   // LANDING FLOOR
   function createSlab3(loader, createMesh, next, callback) {
@@ -175,7 +222,8 @@ function main() {
       console.log(object.children.length); // Check if there are children
       if (object.children.length > 0) {
         let slab3 = object.children[0]; // Use the first child
-        slab3.add(createMesh(slab3.geometry, slabMat, 'Slab3'));
+        slab3.name = 'Slab3';
+        slab3.add(createMesh(slab3.geometry, slabMat, 'Slab3', 1));
         next();
         callback(slab3);
       } else {
@@ -185,54 +233,37 @@ function main() {
   }
 
   // Usage
-  createSlab3(loader, createMesh, next, function(slab_3) {
-    console.log(slab_3);
-    group.add(slab_3);
+  createSlab3(loader, createMesh, next, function(s3_Add) {
+    console.log(s3_Add);
+    s1_group.add(s3_Add);
   });
 
-//   // Columns  TODO for loop + createMesh
-//   loader.load('static/Column.obj', function(object) {
-//     console.log(object.children.length); // Check if there are children
-//     if (object.children.length > 0) {
-//       const colMat = new THREE.MeshStandardMaterial({
-//         color: 0x949494,
-//         metalness: 0.5,
-//         flatShading: true
-//       });
 
-//       column = object.children[0]; // Use the first child
-//       const meshA = new THREE.Mesh( column.geometry, colMat ); meshA.position.set( 1.925, 0, 0 ); 
-//       const meshB = new THREE.Mesh( column.geometry, colMat ); meshB.position.set( 1.925, 0, 1.95 );
-//       const meshC = new THREE.Mesh( column.geometry, colMat ); meshC.position.set( 1.925, 0, -1.95 );
-      
-//       meshA.castShadow = true;
-//       meshA.receiveShadow = true;
-//       meshB.castShadow = true;
-//       meshB.receiveShadow = true;
-//       meshC.castShadow = true;
-//       meshC.receiveShadow = true;
-  
-//       const columns = new THREE.Group(); 
-//       columns.add( meshA ); 
-//       columns.add( meshB );
-//       columns.add( meshC );      
-//       scene.add(columns);
-
-//       next();
-//     } else {
-//       console.error("No children found in the loaded object.");
-//     }
-//   });
-
-  // WALL 
-  function createWall(loader, createMesh, next, callback) {
-    loader.load('static/Wall.obj', function(object) {
+  // COLUMNS
+  function createColumns(loader, createMesh, next, callback) {
+    const mesh = [];
+    loader.load('static/Column.obj', function(object) {
       console.log(object.children.length); // Check if there are children
       if (object.children.length > 0) {
-        let wall = object.children[0]; // Use the first child
-        wall.add(createMesh(wall.geometry, wallMat, 'Wall'));
+        let column = object.children[0]; // Use the first child
+        let a = 1.925;
+        let b = 0;
+        let c = -1.95;
+        for (let i = 0; i < 3; i++) {
+          mesh[i] = createMesh(column.geometry, steelMat, `Columns`, 1)
+          mesh[i].position.set(a, b, c)
+          console.log(`Mesh ${i} position:`, mesh[i].position);
+          c += 1.95;
+        }
+
+        const c_Add = new THREE.Group();
+        for (let i = 0; i < mesh.length; i++) {
+          c_Add.add(mesh[i]);
+        }
+  
         next();
-        callback(wall);
+        callback(c_Add);
+
       } else {
         console.error("No children found in the loaded object.");
       }
@@ -240,10 +271,11 @@ function main() {
   }
 
   // Usage
-  createWall(loader, createMesh, next, function(wall_1) {
-    console.log(wall_1);
-    group.add(wall_1);
+  createColumns(loader, createMesh, next, function(c_Add) {
+    console.log(c_Add);
+    group.add(c_Add);
   });
+
 
   // ROOF BEAMS
   function createBeams1(loader, createMesh, next, callback) {
@@ -256,19 +288,19 @@ function main() {
         let q = 0;
         let r = -1.95;
         for (let i = 0; i < 3; i++) {
-          mesh[i] = createMesh(beam1.geometry, wallMat, `Beam1${i}`)
+          mesh[i] = createMesh(beam1.geometry, steelMat, `Beams`, 1)
           mesh[i].add(beam1)
           mesh[i].position.set(p, q, r)
           console.log(`Mesh ${i} position:`, mesh[i].position);
           r += 1.95;
         }
-        const beams1 = new THREE.Group();
+        const b1_Add = new THREE.Group();
         for (let i = 0; i < mesh.length; i++) {
-          beams1.add(mesh[i]);
+          b1_Add.add(mesh[i]);
         }
   
         next();
-        callback(beams1);
+        callback(b1_Add);
 
       } else {
         console.error("No children found in the loaded object.");
@@ -277,10 +309,11 @@ function main() {
   }
 
   // Usage
-  createBeams1(loader, createMesh, next, function(beams_1) {
-    console.log(beams_1);
-    group.add(beams_1);
+  createBeams1(loader, createMesh, next, function(b1_Add) {
+    console.log(b1_Add);
+    group.add(b1_Add);
   });
+
 
   // LEVELS 1 & 2 BEAMS
   function createBeams2(loader, createMesh, next, callback) {
@@ -293,7 +326,7 @@ function main() {
         let q = 0;
         let r = -1.95;
         for (let i = 0; i < 3; i++) {
-          mesh[i] = createMesh(beam2.geometry, wallMat, `Beam2${i}`)
+          mesh[i] = createMesh(beam2.geometry, steelMat, `Beam2${i}`)
           mesh[i].add(beam2)
           mesh[i].position.set(p, q, r)
           console.log(`Mesh ${i} position:`, mesh[i].position);
@@ -303,7 +336,7 @@ function main() {
         let t = 2.5;
         let u = -1.95;
         for (let j = 0; j < 3; j++) {
-          mesh[3 + j] = createMesh(beam2.geometry, wallMat, `Beam2${3 + j}`);
+          mesh[3 + j] = createMesh(beam2.geometry, steelMat, `Beam2${3 + j}`);
           mesh[3 + j].add(beam2);
           mesh[3 + j].position.set(s, t, u);
           console.log(`Mesh ${3 + j} position:`, mesh[3 + j].position);
@@ -363,7 +396,7 @@ function main() {
         let n = 0.541071;
                 
         for (let i = 0; i < 13; i++) {
-          mesh[i] = createMesh(stair.geometry, stairMat, `Stair${i}`);
+          mesh[i] = createMesh(stair.geometry, steelMat, `Stair${i}`);
           mesh[i].add(stair);
           mesh[i].position.set(m, n);
           console.log(`Mesh ${i} position:`, mesh[i].position);
@@ -392,94 +425,162 @@ function main() {
 
   // allows previous function to fully load
    function next() {
-     if (slab1) {
-       console.log('done');
-     }
-     if (slab2) {
-       console.log('done');
-     }
-     if (slab3) {
-       console.log('done');
-     }
-//     if (column) {
-//       console.log('done');
-//     }
-     if (wall) {
-       console.log('done');
-     }
-     if (beam1) {
-       console.log('done');
-     }
-     if (beam2) {
-       console.log('done');
-     }
-     if (roof) {
-       console.log('done');
-     }
-     if (stair) {
-       console.log('done');
-     }
+    if (wall) {
+      console.log('done');
+    }
+    if (slab1) {
+      console.log('done');
+    }
+    if (slab2) {
+      console.log('done');
+    }
+    if (slab3) {
+      console.log('done');
+    }
+    if (column) {
+      console.log('done');
+    }
+    if (beam1) {
+      console.log('done');
+    }
+    if (beam2) {
+      console.log('done');
+    }
+    //  if (roof) {
+    //    console.log('done');
+    //  }
+    //  if (stair) {
+    //    console.log('done');
+    //  }
    }
 
-//   // END OF GEOMETRY SETUP
+// END OF GEOMETRY SETUP
 
-// ADD GROUP TO SCENE HERE
-
-    // ADD PARAGRAPH CONTAINER DIV
-    // const p = document.createElement('p');
-    // p.className = 'tooltip';
-    // const pContainer = document.createElement('div');
-    // pContainer.appendChild(p);
-    // const cPointLabel = new CSS2DObject(pContainer);
-    // scene.add(cPointLabel);
+  // ADD PARAGRAPH CONTAINER DIV
+  const p = document.createElement('p');
+  p.className = 'tooltip';
+  const pContainer = document.createElement('div');
+  pContainer.appendChild(p);
+  const cPointLabel = new CSS2DObject(pContainer);
+  scene.add(cPointLabel);
 
 
-//   // RAYCASTER
+
+  // how to use // p.expandingList = document.createElement("ul", { is: "expanding-list" });
+  // to make propertysets list for WallCommon
+
+  // Get the comma-separated string
+  let listString = 'Reference, Status, Acoustic Rating, Fire Rating, Combustible, SurfaceSpreadofFlame, Thermal Transmittance, IsExternal, ExtendtoStructure, LoadBearing, Compartmentation';
+
+  // Split the string into an array of items
+  let listItems = listString.split(', ');
+
+  // Create a new list element
+  let ul = document.createElement('ul');
+
+  // Remove all text nodes from ul
+  ul.childNodes.forEach(node => {
+  if (node.nodeType === Node.TEXT_NODE) {
+      ul.removeChild(node);
+    }
+  });
+
+  // Iterate over the array and create list items
+  listItems.forEach(function(item) {
+      let li = document.createElement('li');
+      li.textContent = item;
+      ul.appendChild(li);
+
+  });
+
+// RAYCASTER
  
-    // const mousPos = new THREE.Vector2();
-    // const raycaster = new THREE.Raycaster();
+  const mousPos = new THREE.Vector2();
+  const raycaster = new THREE.Raycaster();
+  raycaster.layers.set(1);
 
-    // window.addEventListener('mousemove', function(e) {
-    //   mousPos.x = (e.clientX / this.window.innerWidth) * 2 - 1;
-    //   mousPos.y = - (e.clientY / this.window.innerHeight) * 2 + 1;
+  window.addEventListener('click', function(e) {
+    mousPos.x = (e.clientX / w) * 2 - 1;
+    mousPos.y = - (e.clientY / h) * 2 + 1;
+    console.log("Mouse Position:", mousPos);
+  
+    raycaster.setFromCamera(mousPos, camera);
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    console.log("Intersections:", intersects);
+  
+    if (intersects.length > 0) {
+      let intersectedObject = intersects[0].object;
+      console.log("Clicked on:", intersectedObject.name);
 
-    //   raycaster.setFromCamera(mousPos, camera);
-    //   const intersects = raycaster.intersectObject(group);
-    //   console.log(intersects);
-    //   if (intersects.length > 0) {
-    //     switch (intersects[0].object.name) {
+        switch (intersectedObject.name) {
 
-//         case 'Wall':
-//           p.className = 'tooltip show';
-//           cPointLabel.position.set(10,10,10);
-//           p.textContent = 'ifcWall Properties: blah, blah...';
-//           break;
+          case 'Wall':
+            p.className = 'tooltip show';
+            cPointLabel.position.set(0,0,0);
+            p.textContent = 'Pset_WallCommon:';
+            p.appendChild(ul);
+            console.log("p after appending:", p);
+            //p.baseURI(https://standards.buildingsmart.org/IFC/DEV/IFC4_2/FINAL/HTML/link/pset_wallcommon.htm);
+            break;
+            
+          case 'Slab1':
+            p.className = 'tooltip show';
+            cPointLabel.position.set(0,0,0);
+            p.textContent = 'Pset_SlabCommon: TODO';
+            break;            
+            
+          case 'Slab2':
+            p.className = 'tooltip show';
+            cPointLabel.position.set(0,0,0);
+            p.textContent = 'ifcSlab2 Properties: TODO';
+            break;
 
-            // case 'Slab1':
-            // p.className = 'tooltip show';
-            // cPointLabel.position.set(3,3,3);
-            // p.textContent = 'ifcSlab Properties: blah, blah...';
-            // break;
+          case 'Slab3':
+            p.className = 'tooltip show';
+            cPointLabel.position.set(0,0,0);
+            p.textContent = 'ifcSlab3 Properties: TODO';
+            break;
 
-//         case 'Stairs':
-//           p.className = 'tooltip show';
-//           cPointLabel.position.set(10,10,10);
-//           p.textContent = 'ifcStair Properties: blah, blah...';
-//           break;
+          case 'Columns':
+            p.className = 'tooltip show';
+            cPointLabel.position.set(0,0,0);
+            p.textContent = 'IfcColumn Properties: TODO';
+            break;
 
-    //       default:
-    //         break;
-    //     }
+          case 'Beams':
+            p.className = 'tooltip show';
+            cPointLabel.position.set(0,0,0);
+            p.textContent = 'IfcBeams Properties: TODO';
+            break;
+        
 
-    //   } else {
+          default:
 
-    //       p.className = 'tooltip hide';
-    //   }
+            break;
+  
+          }
+  
+    } else {
+        p.className = 'tooltip hide';
+        console.log("Not hovering over any object");
+    }
 
-    // });
+  });
+
+          // case 'Slab2':
+          //   p.className = 'tooltip show';
+          //   cPointLabel.position.set(0,0,0);
+          //   p.textContent = 'ifcSlab2 Properties: TODO';
+          //   break;      case 'Slab1':
+
+          // case 'Slab3':        
+          //   p.className = 'tooltip show';
+          //   cPointLabel.position.set(0,0,0);
+          //   p.textContent = 'ifcSlab3 Properties: TODO';
+          //   break;
+        
 
 
-  // COMMENT OUT ALL TO HERE
 
   // END RAYCASTER SETUP
 
@@ -528,7 +629,6 @@ function main() {
     labelRenderer.render(scene, camera);
     controls.update();
   }
-
   animate();
 
   function handleWindowResize() {
