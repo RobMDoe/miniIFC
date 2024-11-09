@@ -470,7 +470,7 @@ function main() {
   // to make propertysets list for WallCommon
 
   // Get the comma-separated string
-  let listString = 'Reference, Status, Acoustic Rating, Fire Rating, Combustible, SurfaceSpreadofFlame, Thermal Transmittance, IsExternal, ExtendtoStructure, LoadBearing, Compartmentation';
+  let listString = 'Reference: Value, Status: Value, Acoustic Rating: Value, Fire Rating: Value, Combustible: Value, SurfaceSpreadofFlame: Value, Thermal Transmittance: Value, IsExternal: Value, ExtendtoStructure: Value, LoadBearing: Value, Compartmentation: Value';
 
   // Split the string into an array of items
   let listItems = listString.split(', ');
@@ -516,7 +516,7 @@ function main() {
 
           case 'Wall':
             p.className = 'tooltip show';
-            cPointLabel.position.set(0,0,0);
+            cPointLabel.position.set(0,0,5);
             p.textContent = 'Pset_WallCommon:';
             p.appendChild(ul);
             console.log("p after appending:", p);
@@ -525,32 +525,32 @@ function main() {
             
           case 'Slab1':
             p.className = 'tooltip show';
-            cPointLabel.position.set(0,0,0);
-            p.textContent = 'Pset_SlabCommon: TODO';
+            cPointLabel.position.set(0,0,5);
+            p.textContent = 'Pset_SlabCommon_1: TODO';
             break;            
             
           case 'Slab2':
             p.className = 'tooltip show';
-            cPointLabel.position.set(0,0,0);
-            p.textContent = 'ifcSlab2 Properties: TODO';
+            cPointLabel.position.set(0,0,5);
+            p.textContent = 'Pset_SlabCommon_2: TODO';
             break;
 
           case 'Slab3':
             p.className = 'tooltip show';
-            cPointLabel.position.set(0,0,0);
-            p.textContent = 'ifcSlab3 Properties: TODO';
+            cPointLabel.position.set(0,0,5);
+            p.textContent = 'Pset_SlabCommon_3: TODO';
             break;
 
           case 'Columns':
             p.className = 'tooltip show';
-            cPointLabel.position.set(0,0,0);
-            p.textContent = 'IfcColumn Properties: TODO';
+            cPointLabel.position.set(0,0,5);
+            p.textContent = 'Pset_ColumnCommon: TODO';
             break;
 
           case 'Beams':
             p.className = 'tooltip show';
-            cPointLabel.position.set(0,0,0);
-            p.textContent = 'IfcBeams Properties: TODO';
+            cPointLabel.position.set(0,0,5);
+            p.textContent = 'Pset_BeamCommon_1: TODO';
             break;
         
 
