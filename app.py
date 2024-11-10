@@ -46,7 +46,7 @@ def index():
     """Show IFC files"""
     # set session
     user_id = session["user_id"]
-
+    
     all = db.execute("SELECT ifc_name, obj_name, user_id FROM ifcobj WHERE user_id = ?", user_id)
     
     return render_template("index.html", all=all)
@@ -148,7 +148,7 @@ def ifc():
 
     if request.method == "POST":
 
-        # user creates an ifc file 'Wall.ifc', 'Pipe.ifc', 'Plate.ifc'
+        # user creates an ifc file 'Wall.ifc', 'Slab.ifc', 'Beam.ifc'
         ifc_name = request.form.get("dropdown")
 
         # if file_name exists in db issue alert 
@@ -178,7 +178,7 @@ def ifc():
         ifc_name = ifc_name.replace("ifc", "")
         
         file.write("ifc_files/" + ifc_name + ".ifc")
-        file.write("ifc_files/" + ifc_name + ".txt")
+        #file.write("ifc_files/" + ifc_name + ".txt")
     
         return redirect ("/")
 
@@ -199,55 +199,55 @@ def spf():
                       
         if ifc_name == "Wall":
 
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+            with open("ifc_files/" + ifc_name + ".ifc", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)
                             
         elif ifc_name == "Slab1":
 
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+            with open("ifc_files/" + ifc_name + ".ifc", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)
             
         elif ifc_name == "Slab2":
 
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+            with open("ifc_files/" + ifc_name + ".ifc", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)
             
         elif ifc_name == "Slab3":
 
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+            with open("ifc_files/" + ifc_name + ".ifc", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)
             
         elif ifc_name == "Column":
 
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+            with open("ifc_files/" + ifc_name + ".ifc", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)            
         
         elif ifc_name == "Beam1":
 
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+            with open("ifc_files/" + ifc_name + ".ifc", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)
             
         elif ifc_name == "Beam2":
 
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+            with open("ifc_files/" + ifc_name + ".ifc", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)
             
         elif ifc_name == "Roof":
 
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+            with open("ifc_files/" + ifc_name + ".ifc", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)
 
         elif ifc_name == "Stair":
 
-            with open("ifc_files/" + ifc_name + ".txt", 'r') as file:
+            with open("ifc_files/" + ifc_name + ".ifc", 'r') as file:
                 lines = file.readlines()
                 return render_template("ascii.html", lines=lines)                      
 

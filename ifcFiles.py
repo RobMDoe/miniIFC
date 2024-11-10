@@ -12,7 +12,7 @@ import numpy
 
 def ifcWall():
 
-    # Create a blank model
+    # Create a blank model (IfcWall comments are by Dion Moult)
     file = ifcopenshell.api.project.create_file()
 
     # All projects must have one IFC Project element
