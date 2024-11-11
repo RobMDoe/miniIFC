@@ -8,6 +8,8 @@ miniIFC is a micro learning module to introduce the Industry Foundation Classes(
 
 > An IFC model is a collection of elements (e.g. doors, windows, construction tasks, materials, etc) with relationships to other elements in a graph-like database. Together, these elements and their relationships describe the digital built environment. Each element has a type known as an IFC Class. These classes define the attributes that the element may store. For example, the IfcWall Class is allowed to store a Name and Description attribute.This IFC database can be stored in many formats. The most common is the .ifc format, which stores data in plain text. [reference] (https://docs.ifcopenshell.org/introduction/introduction_to_ifc.html)
 
+To contain each dependency's influence the repository 'CS50_FP_MINIIFC' is a Conda virtual environment 'miniifc'  within Visual Studio Code for Windows. It is also a git repository with commits pushed to [GitHub](https://github.com/RobMDoe/cs50-fp.git).
+
 ## REGISTER, LOGIN, LOGOUT, CHANGE PASSWORD
 
 Functions are from CS50 Problem Set 9 'Finance'. SQL db [miniifc](/miniifc.db) table 'users' stores 'user name', 'id' and 'hash'. On succesful login the user is redirected to [index.html](/templates/index.html) and headings from [miniifc](/miniifc.db) table 'ifcobj' which are 'ifc', 'obj', and 'user_id'. The index keeps track of the user's progress through the micro learning module. On the index page, the navigation bar indicates options 'IFC', 'SPF', 'OBJ', 'GEO' which allow the user to create and view in various formats the IFC elements (wall, floors, roof, beams, columuns, stairs).
@@ -30,9 +32,11 @@ TODO. Expose to user input 'Placement' and 'Representation' parameters.
 
 ## CREATE OBJ FROM IFC ELEMENT
 
-file convert ifc to obj
+OBJ file is an open format developed by [Wavefront Technologies](https://en.wikipedia.org/wiki/Wavefront_.obj_file). It is a simple data-format that represents 3D geometry — the position of each vertex, the UV position of each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of vertices, and texture vertices.
 
-IfcConvert is a command-line application for converting IFC geometry into file formats such as OBJ, DAE, GLB, STP, IGS, XML, SVG, H5, and IFC itself.
+From [obj.html](/templates/obj.html) dropdown the user selects an OBJ element and clicks the button 'Model OBJ'.  After checking for a duplicate name and id, the obj_name and user_id are stored in [miniifc](/miniifc.db) table 'ifcobj'. The OBJ file hasn't yet been created but it will need to be located in the /static folder so that it can be read by OBJloader in [render.js](/static/render.js) and viewed on a WebGL2 canvas. 
+
+The ifc_name is queried by the def obj() function in [app](/app.py). If its equivalent .obj and .mtl files already exist in the static folder then they are removed as they cannot be overwritten. The .ifc file needs to exist before it can be converted to a .obj and .mtl (material properties) file using [IfcConvert](https://docs.ifcopenshell.org/ifcconvert.html), a command-line application by IfcOpenShell for converting IFC geometry into file formats such as OBJ, DAE, GLB, STP, IGS, XML, SVG, H5, and IFC itself. IfcConvert can be used to convert only specific elements such as a wall, floor or slab, not aggregated elements. Once the .obj is created the user is redirected to [index](/templates/index.html) which confirms creation of the OBJ element under the 'obj' heading. The .mtl file is not used by the OBJloader as it contains no data. Instead, materials are created separately using [THREE.js](https://threejs.org/) JavaScript 3D library in [render.js](/static/render.js).
 
 ## VIEW IFC GEOMETRY + PROPERTIES
 
