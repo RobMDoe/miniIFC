@@ -48,8 +48,9 @@ function main() {
   // Label Renderer
   const labelRenderer = new CSS2DRenderer();
   labelRenderer.setSize(w, h);
-  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.position = 'fixed';
   labelRenderer.domElement.style.top = '0px';
+  labelRenderer.domElement.style.left = '0px';
   labelRenderer.domElement.style.pointerEvents = 'none';
   document.body.appendChild(labelRenderer.domElement);
   
@@ -154,7 +155,7 @@ function main() {
         wall.name = 'Wall';
         wall.add(createMesh(wall.geometry, wallMat, 'Wall', 1));
         next();
-        callback(wall); //wall_1? // returns wall object?
+        callback(wall);
       } else {
         console.error("No children found in the loaded object.");
       }
@@ -167,8 +168,6 @@ function main() {
     w_group.add(w_Add);
   });
 
-
-  // ISOLATE WALL FOR NOW ------------------
 
   // LEVEL 1 FLOOR BUILD-UP
   function createSlab1(loader, createMesh, next, callback) {

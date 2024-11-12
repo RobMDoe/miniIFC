@@ -288,9 +288,8 @@ def obj():
     #if post
     if request.method == "POST":
 
-        # user creates an ifc file 'Wall.ifc', 'Pipe.ifc', 'Plate.ifc'
+        # user requests an ifc file e.g. 'Wall.ifc' etc.
         ifc_name = request.form.get("dropdown")
-        print(ifc_name)
 
         # 
         try:
@@ -430,62 +429,6 @@ def geo():
         # 'Beam1.obj', 'Beam2.obj', 'Column.obj'
         request.form.get("Geometry")
         return render_template("render.html")
-    
-        # "wall.obj", "slab1.obj" etc.
-
-        # objects that exist so far
-        #obj_names = db.execute("SELECT obj_name FROM ifcobj WHERE user_id = ?", user_id)
-        #print(obj_names)
-
-        # print one object
-        #if obj_name in obj_names["obj_name"]: #iterate?
-            #return render_template("render.html") 
-        # render all objects
-        #for obj in obj_names:
-            #if obj["obj_name"] == obj_name:
-                #return render_template("render.html") # pass in value, obj_name "Wall.ifc"
-            #else:
-                #return render_template("geo.html")
-
-        #for n in all_name:
-
-            #if n == ifc_name:
-            
-                #return render_template("render.html")
-
-        #elif ifc_name == "Wall":
-
-            #return render_template("render.html")
-                                  
-        #elif ifc_name == "Slab1":
-
-            #return render_template("render.html")
-        
-        #elif ifc_name == "Slab2":
-
-            #return render_template("render.html")
-        
-        #elif ifc_name == "Slab3":
-
-            #return render_template("render.html")
-                  
-        #elif ifc_name == "Beam1":
-
-            #return render_template("render.html")
-        
-        #elif ifc_name == "Beam2":
-
-            #return render_template("render.html")
-
-        #elif ifc_name == "Column":
-
-            #return render_template("render.html")
-         
-        #elif ifc_name == "Roof":
-
-            #return render_template("render.html")
-        
-        #else: exit
 
     else:
             return render_template("geo.html")

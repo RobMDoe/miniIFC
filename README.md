@@ -4,7 +4,7 @@
 TODO
 
 Description. 
-miniIFC is a micro learning module to introduce the Industry Foundation Classes(IFC) to users in the Architecture, Engineering, Construction, and Operations (AECO) sector. IFC is the common language for the AECO sector which enables interoperability between applications. To create IFC models, the module uses the Python API bindings at  the core of the IfcOpenShell C++ system, an open source software library for software developers and Building Information Modelling (BIM) powerusers working with IFC.
+miniIFC is a micro learning module to introduce the Industry Foundation Classes (IFC) to users in the Architecture, Engineering, Construction, and Operations (AECO) sector. IFC is the common language for the AECO sector which enables interoperability between applications. To create IFC models, the module uses the Python API bindings at  the core of the IfcOpenShell C++ system, an open source software library for software developers and Building Information Modelling (BIM) powerusers working with IFC.
 
 > An IFC model is a collection of elements (e.g. doors, windows, construction tasks, materials, etc) with relationships to other elements in a graph-like database. Together, these elements and their relationships describe the digital built environment. Each element has a type known as an IFC Class. These classes define the attributes that the element may store. For example, the IfcWall Class is allowed to store a Name and Description attribute.This IFC database can be stored in many formats. The most common is the .ifc format, which stores data in plain text. [reference] (https://docs.ifcopenshell.org/introduction/introduction_to_ifc.html)
 
@@ -40,10 +40,38 @@ The ifc_name is queried by the def obj() function in [app](/app.py). If its equi
 
 ## VIEW IFC GEOMETRY + PROPERTIES
 
-WebGL2 is a javascript interface for rendering 2D and 3D graphics.
+WebGL (Web Graphics Library) is a JavaScript API for rendering interactive 3D and 2D graphics in a web browser without the use of plug-ins. It introduces an API that conforms to OpenGL ES 2.0 that can be used in HTML canvas elements. WebGL2 is based on OpenGL ES 3.0.
 
-three.js is a framework for 3D content on the web.
+>Three.js is a cross-browser JavaScript library and application programming interface (API) used to create and display animated 3D computer graphics in a web browser using WebGL.
+
+The user posts'Geometry' to [app](/app.py) function 'def (geo)' and render.html is called. This in turn runs [render.js](/static/render.js) as follows:
+
+### Scene
+1. [Render.html](/templates/render.html) returns an HTML canvas element which is initialised for the WebGL2 context.
+2. Three.js renderer, perspective camera and scene are set up for 3D objects.
+3. Three.js label renderer is set up for 2D text.
+4. Three.js orbit controls are set to allow user to navigate the scene using the mouse.
+5. End of scene set up
+### Geometry
+6. Element (wall, floor...) variables are set.
+7. Create mesh function takes geometry, material, name, layer parameters.
+8. Materials are created.
+9. OBJloader is instantiated. 
+10. A function creates an element object (wall, floor...) from .obj file in /static folder.
+11. Element object is added to a group.
+12. End of geometry set up.
+### Labels
+13. A paragraph container is created for labels (text).
+14. An unordered list is made to describe the object element's property set (reference, status, acoustic rating, fire rating...).
 
 >IfcPropertyDefinition captures dynamically extensible property sets. A property set contains one or more properties which may be a single value (e.g. string, number, unit measurement), a bounded value (having minimum and maximum), an enumeration, a list of values, a table of values, or a data structure. While IFC defines several hundred property sets for specific types, custom property sets may be defined by application vendors or end users.
 
->IfcPropertySet represents a set of properties attached to an object occurrence or object type. [reference](https://en.wikipedia.org/wiki/Industry_Foundation_Classes)
+>IfcPropertySet represents a set of properties attached to an object occurrence or object type. 
+[reference](https://en.wikipedia.org/wiki/Industry_Foundation_Classes)
+
+### Raycaster
+15. Raycaster set up so that mouse position click intersects 3D element objects to append labels (text).
+### Directional lights and plane
+16. Directional lights and a plane are set up and added to the scene.
+### Animation
+17. Animation allows the renderer to update as object elements and labels are navigated by orbit controls.
