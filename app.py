@@ -193,6 +193,12 @@ def ifcinfo():
     print("ifcinfo route accessed")
     return render_template("ifcinfo.html")
 
+@app.route("/ifcbckg", methods=["GET", "POST"])
+@login_required
+def ifcbckg():
+    print("ifcbckg route accessed")
+    return render_template("ifcbckg.html")
+
 
 @app.route("/spf", methods=["GET", "POST"])
 @login_required
@@ -262,6 +268,13 @@ def spf():
             return render_template("spf.html")
 
 
+@app.route("/spfinfo", methods=["GET", "POST"])
+@login_required
+def spfinfo():
+    print("spfinfo route accessed")
+    return render_template("spfinfo.html")
+
+
 @app.route("/sql", methods=["GET", "POST"])
 @login_required
 def sql():
@@ -269,9 +282,6 @@ def sql():
     
     #return apology("TODO")
     if request.method == "POST":
-
-        # user creates sql .db for each file 'Wall.obj'...
-        #ifc_name = request.form.get("dropdown")
 
         # convert ifc to sqlite3 and store in ifcfiles.db # overwrite each time?
         os.system('cmd /c python -m ifcpatch -i "ifc_files/Wall.ifc" -o "ifcfiles.db" -r "Ifc2Sql" -a "sqlite"')
@@ -286,6 +296,13 @@ def sql():
     else:
         
         return render_template("sql.html")
+
+
+@app.route("/sqlinfo", methods=["GET", "POST"])
+@login_required
+def sqlinfo():
+    print("sqlinfo route accessed")
+    return render_template("sqlinfo.html")
 
 
 @app.route("/obj", methods=["GET", "POST"])
@@ -427,6 +444,13 @@ def obj():
         return render_template("obj.html")
 
 
+@app.route("/objinfo", methods=["GET", "POST"])
+@login_required
+def objinfo():
+    print("objinfo route accessed")
+    return render_template("objinfo.html")
+
+
 @app.route("/geo", methods=["GET", "POST"])
 @login_required
 def geo():
@@ -441,19 +465,16 @@ def geo():
             return render_template("geo.html")
 
 
-#@app.route("/view", methods=["GET", "POST"])
-#@login_required
-#def view():
-    #"""View IFC model"""
-
-    #set session
-    #user_id = session["user_id"] # for storing in dbase
-
-    #return render_template("view.html")
-
-@app.route("/store")
+@app.route("/geoinfo", methods=["GET", "POST"])
 @login_required
-def store():
-    """Show files etc."""
-    return apology("TODO")
+def geoinfo():
+    print("geoinfo route accessed")
+    return render_template("geoinfo.html")
+
+
+#@app.route("/store")
+#@login_required
+#def store():
+    #"""Show files etc."""
+    #return apology("TODO")
     #return render_template("index.html")

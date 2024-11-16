@@ -7,16 +7,17 @@
 {% block main %}
 
     <div style="background-color: rgb(0, 158, 156); color:white; padding:10px; text-align:left; font: size 20px;">
-        <p><b>miniIFC</b> is a micro learning module to introduce the Industry Foundation Classes (IFC) to users in the Architecture, Engineering, Construction, and Operations (AECO) sector. IFC is the common language for the AECO sector which enables interoperability between applications. To create IFC models, the module uses Python API bindings at the core of the IfcOpenShell C++ system, an open source software library for software developers and Building Information Modelling (BIM) users working with IFC.</p>
+        <p><b>Industry Foundation Classes (IFC)</b> are a set of standardized, digital descriptions of the built asset industry. It is an open, global standard published under a Creative Commons license, and as ISO 16739. IFC provides machine interpretability of information and thereby enables automation of workflows. It is vendor-neutral and available to everyone.
+        <a href="https://www.buildingsmart.org/standards/bsi-standards/industry-foundation-classes/" style="font: size 0px; color: white;" target="_blank">buildingSMART International</a></li></p>
+        
         <ul>
-            <li><p>IFC is a standardized, digital description of the built asset industry.</p></li>
-            <li><p>It is an open, international standard (ISO 16739-1:2024) which promotes vendor-neutral, or agnostic, and usable capabilities across a wide range of hardware devices, software platforms, and interfaces for many different use cases.</p></li>
-            <li><p>An IFC model is a collection of elements (e.g. doors, windows, construction tasks, materials, etc) with relationships to other elements in a graph-like database. Together, these elements and their relationships describe the digital built environment. Each element has a type known as an IFC Class. These classes define the attributes that the element may store. For example, the IfcWall Class is allowed to store a Name and Description attribute.This IFC database can be stored in many formats and the most common is .ifc which stores data in plain text.
-            <a href="https://docs.ifcopenshell.org/introduction/introduction_to_ifc.html" style="font: size 0px; color: white;" target="_blank">IfcOpenShell</a></p></li>
+            <li>Select an element from the dropdown list ('Wall.ifc', 'Slab1.ifc'...).</li>
+            <li>Button `Create IFC` writes an IFC file which is stored in a folder.</li>
+            <li>/Home page lists files created by the user under the 'ifc' and 'obj' headings.</li>
+            <li>Note: to view 'ifc' geometry both an 'ifc' files and an 'obj' are required.</li>
         </ul>
-        <p></p>
-        <p>Learn more about the pioneers of IFC by watching a video produced in 1994 by members of the incipient buildingSMART International which helped introduce the complex concept of interoperability in the AECO sector by comparison with the allegory of those Ancients tasked to build the mythical Tower of Babel. 
-        <a href="https://youtu.be/g_jmGQvr6dQ?si=nX7MovYISQ7QSmp8" style="font: size 0px; color: white;" target="_blank">'The End of Babel' (1994)</a></p>
     </div>
+
+    <a href="{{ url_for('ifcbckg') }}" style="display: block; text-align: center; size: 20px;" class="bsiblue" target="_blank"><b>background</b></a>
 
 {% endblock %}

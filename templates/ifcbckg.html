@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    ifcbckg - background information
+{% endblock %}
+
+{% block main %}
+
+    <div style="background-color: rgb(0, 158, 156); color:white; padding:10px; text-align:left; font: size 20px;">
+        <ul>
+            <p><b>miniIFC</b> is a micro learning module to introduce the Industry Foundation Classes (IFC) to users in the Architecture, Engineering, Construction, and Operations (AECO) sector. IFC is the common language for the AECO sector which enables interoperability between applications. To create IFC models, the module uses Python API bindings at the core of the IfcOpenShell C++ system, an open source software library for software developers and Building Information Modelling (BIM) users working with IFC.</p>
+            <li>Learn more from the pioneers of IFC by watching a video produced in 1994 by members of the incipient buildingSMART International which helped introduce the complex concept of interoperability in the AECO sector by comparison with the allegory of those Ancients tasked to build the mythical Tower of Babel. 
+                <a href="https://youtu.be/g_jmGQvr6dQ?si=nX7MovYISQ7QSmp8" style="font: size 0px; color: white;" target="_blank">'The End of Babel' (1994)</a></li>
+            <p><li>An IFC model is a collection of elements (e.g. doors, windows, construction tasks, materials, etc) with relationships to other elements in a graph-like database. Together, these elements and their relationships describe the digital built environment. Each element has a type known as an IFC Class. These classes define the attributes that the element may store. For example, the IfcWall Class is allowed to store a Name and Description attribute.This IFC database can be stored in many formats and the most common is .ifc which stores data in plain text.
+            <a href="https://docs.ifcopenshell.org/introduction/introduction_to_ifc.html" style="font: size 0px; color: white;" target="_blank">IfcOpenShell</a></li></p>
+        </ul>
+        <p></p>
+    </div>
+
+{% endblock %}

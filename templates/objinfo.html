@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    objinfo
+{% endblock %}
+
+{% block main %}
+
+    <div style="background-color: rgb(0, 158, 156); color:white; padding:10px; text-align:left; font: size 20px;">
+        <p><b>OBJ file</b> is an open format developed by Wavefront Technologies <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file" style="font: size 0px; color: white;" target="_blank">Wavefront</a></p>
+        <p>OBJ is a simple data-format that represents 3D geometry - the position of each vertex, the UV position of each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of vertices, and texture vertices.</p>
+        <ul>    
+            <li>Select an element from the dropdown list ('Wall.ifc', 'Slab1.ifc'...).</li>
+            <li>Button `Convert OBJ` converts the IFC file into an OBJ file.</li>
+            <li>An OBJ file is needed to view IFC geometry.</li>
+            <li>/Home page lists files created by the user under the 'ifc' and 'obj' headings.</li>
+        </ul>
+    </div>
+
+{% endblock %}

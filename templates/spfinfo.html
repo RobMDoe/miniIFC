@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    spfinfo
+{% endblock %}
+
+{% block main %}
+
+    <div style="background-color: rgb(0, 158, 156); color:white; padding:10px; text-align:left; font: size 20px;">
+        <p><b>STEP Physical Format</b>(SPF or IFC-SPF) is the most widely used format for IFC in practice. IFC-SPF is based on the ISO standard for clear text representation of EXPRESS data models ISO 10303-21.</p>
+        <ul>
+            <li>Select an element from the dropdown list ('Wall.ifc', 'Slab1.ifc'...).</li>
+            <li>The button `View IFC` takes the user directly to the IFC-SPF file in ASCII (American Standard Code for Information Interchange) format</li>
+            <li>IFC classes for 'Header' and 'Data' are shown on each line.</li> 
+            <li>For example, IfcWall classes for 'Placement' and 'Representation' respectively can be viewed on lines 24, 32 and 36:</li>
+            <div style text-indent: 50px>#18=IFCWALL('3KSRNrT8vBgwvGC59n9aPi',$,$,$,$,#40,#34,$,$);    
+            <div style text-indent: 50px>#24=IFCCARTESIANPOINTLIST2D(((0.,0.),(0.,300.),(5000.,300.),(5000.,0.),(0.,0.)));   length = 5m, thickness = 0.3m</div>
+            <div style text-indent: 50px>#32=IFCEXTRUDEDAREASOLID(#27,#31,#26,4000.);                                        width = 4m</div>
+            <div style text-indent: 50px>#36=IFCCARTESIANPOINT((-2000.,0.,-2000.));                                          coordinates x,y,z = (-2m,0m,-2m)</div>
+        </ul>
+    </div>
+
+{% endblock %}

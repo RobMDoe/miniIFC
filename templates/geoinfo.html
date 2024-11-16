@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    geoinfo
+{% endblock %}
+
+{% block main %}
+
+    <div style="background-color: rgb(0, 158, 156); color:white; padding:10px; text-align:left; font: size 20px;">
+        <p><b>WebGL</b> (Web Graphics Library) is a JavaScript API for rendering interactive 3D and 2D graphics in a web browser without the use of plug-ins. It introduces an API that conforms to OpenGL ES 2.0 for use in HTML canvas elements. WebGL2 is based on OpenGL ES 3.0. <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file" style="font: size 0px; color: white;" target="_blank">Wavefront</a></p>
+        <p>Three.js is a cross-browser JavaScript library and application programming interface (API) used to create and display animated 3D computer graphics in a web browser using WebGL <a href="https://en.wikipedia.org/wiki/Three.js" style="font: size 0px; color: white;" target=_blank>webgl</a></p>
+        <ul>    
+            <li>Button `View OBJ` shows geometry created by the user.</li>
+            <li>Property sets are also displayed for each element ('wall', 'slab'...)</li>
+            <li>/Home page lists files created by the user under the 'ifc' and 'obj' headings.</li>
+        </ul>
+    </div>
+
+{% endblock %}

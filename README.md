@@ -34,9 +34,13 @@ TODO.
 
 ## CREATE SQL FROM IFC ELEMENT
 
+SQLite is a C-language library that implements a small, fast, self-contained, high-reliability, full-featured, SQL database engine. SQLite is the most used database engine in the world. [SQLite](https://www.sqlite.org/)
+
+- An SQL database and tables are created for each IFC element using `ifcpatch` [ifc2SQL](https://docs.ifcopenshell.org/autoapi/ifcpatch/recipes/Ifc2Sql/index.html), a recipe from IfcOpenShell which converts an IFC-SPF model to SQLite. This creates an SQL database [ifcFiles.db](ifcFiles.db) with many tables for each IFC element.
+- Ideally, SQL .db would store .ifc and .obj files for each user to allow querying and viewing based on id. But, patch recipe `ifc2SQL` an unwieldy number of tables, as noted above. 
+- Each user's .ifc in '/ifc_files' and .obj in '/static' are stored in folders in the repository as a temporary solution.
+
 TODO.
-- Code included in app.py (commented out) using `ifcpatch` [ifc2SQL](https://docs.ifcopenshell.org/autoapi/ifcpatch/recipes/Ifc2Sql/index.html), a recipe from IfcOpenShell which converts an IFC-SPF model to SQLite. It creates an SQL database [ifcFiles.db](ifcFiles.db) with many tables for each IFC element.
-- Ideally, SQL .db should store .ifc and .obj files for each user to allow querying and viewing based on id. But, patch recipe `ifc2SQL` is unwieldy, as noted above. Storing each users' .ifc in '/ifc_files' and .obj in '/static' folders in the repository is a temporary solution.
 - Simplify database to include relevant tables and IFC elements for querying, viewing, etc.
 
 ## CREATE OBJ FROM IFC ELEMENT
