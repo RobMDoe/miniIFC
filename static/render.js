@@ -422,6 +422,7 @@ function main() {
     group.add(stairs);
   });
 
+  
   // allows previous function to fully load
    function next() {
     if (wall) {

@@ -1,5 +1,5 @@
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -29,7 +29,8 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database - contains userID
-db = SQL("sqlite:///miniifc.db")
+db1 = SQL("sqlite:///miniifc.db")
+db2 = SQL("sqlite:///ifcfiles.db")
 
 
 @app.after_request
@@ -47,7 +48,7 @@ def index():
     # set session
     user_id = session["user_id"]
     
-    all = db.execute("SELECT ifc_name, obj_name, user_id FROM ifcobj WHERE user_id = ?", user_id)
+    all = db1.execute("SELECT ifc_name, obj_name, user_id FROM ifcobj WHERE user_id = ?", user_id)
     
     return render_template("index.html", all=all)
 
@@ -62,7 +63,7 @@ def register():
         if not username:
             # apology is the method which calls apology.html
             return apology("must provide username", 400)
-        usernames = db.execute("SELECT username FROM users")
+        usernames = db1.execute("SELECT username FROM users")
         for user in usernames:
             if user["username"] == username:
                 return apology("username is already taken", 400)
@@ -81,7 +82,7 @@ def register():
         hash = generate_password_hash(password)
 
         # add new row to users, username, hash to users table
-        db.execute("INSERT INTO users (username, hash) VALUES (?,?)", username, hash)
+        db1.execute("INSERT INTO users (username, hash) VALUES (?,?)", username, hash)
 
         # once registered to login
         flash('Registered!')
@@ -109,7 +110,7 @@ def login():
             return apology("must provide password", 400)
 
         # Query database for username
-        rows = db.execute(
+        rows = db1.execute(
             "SELECT * FROM users WHERE username = ?", request.form.get("username")
         )
 
@@ -154,7 +155,7 @@ def ifc():
         # if file_name exists in db issue alert 
         ifc_name = ifc_name + ".ifc"
         try:
-            db.execute("INSERT INTO ifcobj (ifc_name, user_id) VALUES (?, ?)", ifc_name, user_id)
+            db1.execute("INSERT INTO ifcobj (ifc_name, user_id) VALUES (?, ?)", ifc_name, user_id)
         except:
             # catch duplicates
             print("An exception occurred")
@@ -178,13 +179,19 @@ def ifc():
         ifc_name = ifc_name.replace("ifc", "")
         
         file.write("ifc_files/" + ifc_name + ".ifc")
-        #file.write("ifc_files/" + ifc_name + ".txt")
     
         return redirect ("/")
 
     else:
 
         return render_template("ifc.html")
+
+
+@app.route("/ifcinfo", methods=["GET", "POST"])
+@login_required
+def ifcinfo():
+    print("ifcinfo route accessed")
+    return render_template("ifcinfo.html")
 
 
 @app.route("/spf", methods=["GET", "POST"])
@@ -255,25 +262,30 @@ def spf():
             return render_template("spf.html")
 
 
-#@app.route("/sql", methods=["GET", "POST"])
-#@login_required
-#def sql():
-    #"""create sql print out of IfcWall"""
+@app.route("/sql", methods=["GET", "POST"])
+@login_required
+def sql():
+    #"""create sql print out of an IfcWall class"""
     
     #return apology("TODO")
-    # if request.method == "POST":
+    if request.method == "POST":
 
-    # user creates obj file 'Wall.obj', 'Pipe.obj', 'Plate.obj'
-    # ifc_name = request.form.get("dropdown")
+        # user creates sql .db for each file 'Wall.obj'...
+        #ifc_name = request.form.get("dropdown")
 
-    # convert ifc to sqlite3 and store in ifcfiles.db - can't use it??
-    # os.system('cmd /c python -m ifcpatch -i "ifc_files/Wall.ifc" -o "ifcfiles.db" -r "Ifc2Sql" -a "sqlite"')
+        # convert ifc to sqlite3 and store in ifcfiles.db # overwrite each time?
+        os.system('cmd /c python -m ifcpatch -i "ifc_files/Wall.ifc" -o "ifcfiles.db" -r "Ifc2Sql" -a "sqlite"')
 
+        lines = db2.execute("SELECT ifc_id, GlobalId, ObjectPlacement, Representation FROM IfcWall")
 
-    #with open("ifc_files/Wall.txt", 'r') as file:
-        #lines = file.readlines()
+        #with open("ifc_files/Wall.ifc", 'r') as file:
+            #lines = file.readlines()
 
-    #return render_template("sql.html")
+        return render_template("table.html", lines=lines)
+    
+    else:
+        
+        return render_template("sql.html")
 
 
 @app.route("/obj", methods=["GET", "POST"])
@@ -293,7 +305,7 @@ def obj():
 
         # 
         try:
-            db.execute("UPDATE ifcobj SET obj_name = ? WHERE ifc_name = ? AND user_id = ?", ifc_name + ".obj", ifc_name + ".ifc", user_id)
+            db1.execute("UPDATE ifcobj SET obj_name = ? WHERE ifc_name = ? AND user_id = ?", ifc_name + ".obj", ifc_name + ".ifc", user_id)
         except: 
             print("An exception occurred") # catch duplicates
                       
@@ -420,14 +432,9 @@ def obj():
 def geo():
     """create and view GEOMETRY"""
 
-    #set session
-    user_id = session["user_id"]
-
     if request.method == "POST":
 
-        # user creates ifc geometry 'Wall.obj', 'Slab1.obj', 'Slab2.obj', Roof.obj', 
-        # 'Beam1.obj', 'Beam2.obj', 'Column.obj'
-        request.form.get("Geometry")
+        #request.form.get("Geometry")
         return render_template("render.html")
 
     else:
