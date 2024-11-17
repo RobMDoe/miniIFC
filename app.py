@@ -11,6 +11,9 @@ import ifcopenshell.api.spatial
 import ifcopenshell.api.geometry
 import ifcopenshell.api.aggregate
 
+import pandas as pd
+import sqlite3
+
 from helpers import apology, login_required
 import os
 import sys
@@ -30,7 +33,7 @@ Session(app)
 
 # Configure CS50 Library to use SQLite database - contains userID
 db1 = SQL("sqlite:///miniifc.db")
-db2 = SQL("sqlite:///ifcfiles.db")
+#db2 = SQL("sqlite:///ifcfiles.db")
 
 
 @app.after_request
@@ -286,12 +289,28 @@ def sql():
         # convert ifc to sqlite3 and store in ifcfiles.db # overwrite each time?
         os.system('cmd /c python -m ifcpatch -i "ifc_files/Wall.ifc" -o "ifcfiles.db" -r "Ifc2Sql" -a "sqlite"')
 
-        lines = db2.execute("SELECT ifc_id, GlobalId, ObjectPlacement, Representation FROM IfcWall")
+        ####
+        def get_db_connection(): 
+            conn = sqlite3.connect('ifcfiles.db')
+            conn.row_factory = sqlite3.Row 
+            return conn
+        
+        conn = get_db_connection() 
+        data1 = conn.execute('SELECT * FROM IfcWall').fetchall()
+        conn.close() 
+        #print(data1)
 
-        #with open("ifc_files/Wall.ifc", 'r') as file:
-            #lines = file.readlines()
+        conn = get_db_connection() 
+        data2 = conn.execute('SELECT * FROM IfcCartesianPointList2D').fetchall()
+        conn.close()
+        #print(data2)
 
-        return render_template("table.html", lines=lines)
+        conn = get_db_connection() 
+        data3 = conn.execute('SELECT * FROM IfcExtrudedAreaSolid').fetchall()
+        conn.close()
+        #print(data3)         
+        
+        return render_template('table.html', data1=data1, data2=data2, data3=data3)
     
     else:
         

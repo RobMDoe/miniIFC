@@ -6,12 +6,89 @@
 
 {% block main %}
 
-        <div style="background-color: rgb(0, 79, 159); color:white;padding:40px;">
+        <!--<div style="background-color: rgb(0, 79, 159); color:white;padding:40px;">
             <dl style="text-align:center">
             {% for row in lines %}
                 <dt>{{ row }}</dt>
             {% endfor %}
             </dl>
+        </div>-->
+
+        <div style="background-color: rgb(0, 79, 159); color:white;padding:40px;">
+
+        <p style="text-align: left">IfcWall</p>
+        <table border="1"> 
+            <thead> 
+                <tr> 
+                    <th>ifc_id</th> 
+                    <th>GlobalId</th> 
+                    <th>ObjectPlacement</th>
+                    <th>Representation</th>
+                    <th>inverses</th>                    
+                    <!-- Add other columns as needed --> 
+                </tr> 
+            </thead> 
+            <tbody> {% for row in data1 %} 
+                <tr> 
+                    <td>{{ row['ifc_id'] }}</td> 
+                    <td>{{ row['GlobalId'] }}</td> 
+                    <td>{{ row['ObjectPlacement'] }}</td>
+                    <td>{{ row['Representation'] }}</td> 
+                    <td>{{ row['inverses'] }}</td> 
+                    <!-- Add other columns as needed --> 
+                </tr> {% endfor %} 
+            </tbody>
+        </table>
+        <p></p>
+        <p style="text-align: left">IfcCartesianPointsList2D</p>
+        <table border="1"> 
+            <thead> 
+                <tr> 
+                    <th>ifc_id</th> 
+                    <th>CoordList</th> 
+                    <th>inverses</th>                    
+                    <!-- Add other columns as needed --> 
+                </tr> 
+            </thead> 
+            <tbody> {% for row in data2 %} 
+                <tr> 
+                    <td>{{ row['ifc_id'] }}</td> 
+                    <td>{{ row['CoordList'] }}</td> 
+                    <td>{{ row['inverses'] }}</td> 
+                    <!-- Add other columns as needed --> 
+                </tr> {% endfor %} 
+            </tbody>
+        </table>
+        <p></p>
+        <p style="text-align: left">IfcExtrudedAreaSolid</p>
+        <table border="1"> 
+            <thead> 
+                <tr> 
+                    <th>ifc_id</th> 
+                    <th>SweptArea</th> 
+                    <th>Position</th>
+                    <th>ExtrudedDirection</th>
+                    <th>Depth</th>                    
+                    <th>inverses</th>                    
+                    <!-- Add other columns as needed --> 
+                </tr> 
+            </thead>             
+            <tbody> {% for row in data3 %} 
+                <tr> 
+                    <td>{{ row['ifc_id'] }}</td> 
+                    <td>{{ row['SweptArea'] }}</td> 
+                    <td>{{ row['Position'] }}</td>
+                    <td>{{ row['ExtrudedDirection'] }}</td>
+                    <td>{{ row['Depth'] }}</td>
+                    <td>{{ row['inverses'] }}</td> 
+                    <!-- Add other columns as needed --> 
+                </tr> {% endfor %} 
+            </tbody>
+        </table>
+
+
         </div>
+
+
 
 {% endblock %}
