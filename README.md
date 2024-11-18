@@ -30,18 +30,19 @@ STEP Physical Format (SPF or IFC-SPF) is the most widely used format for IFC in 
 #36=IFCCARTESIANPOINT((-2000.,0.,-2000.));                                          coordinates x,y,z = (-2m,0m,-2m)
 ```
 TODO.
-- Expose 'Placement' and 'Representation' parameters for user manipulation.
+- Hyperlinks or pop-outs for IFC class values to explain for better understanding.
 
 ## CREATE SQL FROM IFC ELEMENT
 
 SQLite is a C-language library that implements a small, fast, self-contained, high-reliability, full-featured, SQL database engine. SQLite is the most used database engine in the world. [SQLite](https://www.sqlite.org/)
 
 - An SQL database and tables are created for each IFC element using `ifcpatch` [ifc2SQL](https://docs.ifcopenshell.org/autoapi/ifcpatch/recipes/Ifc2Sql/index.html), a recipe from IfcOpenShell which converts an IFC-SPF model to SQLite. This creates an SQL database [ifcFiles.db](ifcFiles.db) with many tables for each IFC element.
-- Ideally, SQL .db would store .ifc and .obj files for each user to allow querying and viewing based on id. But, patch recipe `ifc2SQL` an unwieldy number of tables, as noted above. 
-- Each user's .ifc in '/ifc_files' and .obj in '/static' are stored in folders in the repository as a temporary solution.
+- Ideally, SQL .db would store .ifc files for each user to allow querying and viewing based on id. But, patch recipe `ifc2SQL` creates an unwieldy number of tables, as noted above.
+- Each user's .ifc in '/ifc_files' and .obj are stored in the '/static' folders in the repository as a temporary solution.
 
 TODO.
-- Simplify database to include relevant tables and IFC elements for querying, viewing, etc.
+- Simplify SQL database to include relevant IFC class tables for querying, viewing, etc.
+- Implement SQL database for better use with .ifc files e.g. re-write SQL table/class to .ifc for real-time viewing and manipulation of IFC properties, either as OBJ or a more sophisticated CAD model format.
 
 ## CREATE OBJ FROM IFC ELEMENT
 
@@ -88,8 +89,8 @@ The user posts `Geometry` to [app.py](/app.py) function `def geo()` which calls 
 
 TODO.
 - WebGL2 displays all .obj files that have been created by all users rather than by each user. Resolve this with SQL database, as noted above.
-
-FUTURE.
-- Create Computer Aided Design (CAD) user interface to allow conceptual architectural design (i.e. early stages) using IFC elements.
 - Dynamically add IFCPropertySet data to ensure conceptual design is foundation for development of IFC data.
 - Create parametric relationships enabling user to manipulate IFC element properties.
+
+FUTURE.
+- Create IFC Computer Aided Design (CAD) system focussed on conceptual architectural design (i.e. early stages) using IFC elements and properties.

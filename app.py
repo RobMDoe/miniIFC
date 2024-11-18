@@ -33,7 +33,6 @@ Session(app)
 
 # Configure CS50 Library to use SQLite database - contains userID
 db1 = SQL("sqlite:///miniifc.db")
-#db2 = SQL("sqlite:///ifcfiles.db")
 
 
 @app.after_request
@@ -298,17 +297,14 @@ def sql():
         conn = get_db_connection() 
         data1 = conn.execute('SELECT * FROM IfcWall').fetchall()
         conn.close() 
-        #print(data1)
 
         conn = get_db_connection() 
         data2 = conn.execute('SELECT * FROM IfcCartesianPointList2D').fetchall()
         conn.close()
-        #print(data2)
 
         conn = get_db_connection() 
         data3 = conn.execute('SELECT * FROM IfcExtrudedAreaSolid').fetchall()
-        conn.close()
-        #print(data3)         
+        conn.close()    
         
         return render_template('table.html', data1=data1, data2=data2, data3=data3)
     
