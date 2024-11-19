@@ -1,5 +1,5 @@
 # miniIFC
-#### Video Demo:  <URL HERE>
+#### Video Demo:  https://youtu.be/4dstB8fpeVM
 #### Description:
 
 miniIFC is a micro learning module to introduce the Industry Foundation Classes (IFC) to users in the Architecture, Engineering, Construction, and Operations (AECO) sector. IFC is the common language for the AECO sector which enables interoperability between applications. To create IFC models, the module uses Python API bindings at the core of the IfcOpenShell C++ system, an open source software library for software developers and Building Information Modelling (BIM) users working with IFC.
